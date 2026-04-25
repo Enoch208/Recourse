@@ -3,9 +3,13 @@ import {
   ArrowRight04Icon,
   BalanceScaleIcon,
   Database02Icon,
+  FileLinkIcon,
   FileVerifiedIcon,
+  Hospital02Icon,
   Invoice01Icon,
   Legal01Icon,
+  Legal02Icon,
+  ReceiptDollarIcon,
   SignatureIcon,
   Stamp02Icon,
 } from "@hugeicons/core-free-icons";
@@ -32,6 +36,20 @@ export const brand = {
   tagline: "You have recourse.",
 };
 
+type Sponsor = { label: string; logo?: string; href?: string };
+
+export const poweredBy = {
+  eyebrow: "Powered by",
+  sponsors: [
+    { label: "BlackWPT", logo: "/blackwptlogo.png" },
+    { label: "/dev/color", logo: "/devcolor.png" },
+    { label: "Anthropic" },
+    { label: "Vercel" },
+    { label: "Next.js" },
+    { label: "OpenAI" },
+  ] satisfies Sponsor[],
+};
+
 export const nav = {
   links: [
     { label: "Solution", href: "#solution" },
@@ -49,6 +67,21 @@ export const hero = {
     "Upload a medical bill. Recourse cites the statute, drafts the demand letter, and hands you a signed PDF.",
   primary: { label: "Request demo", href: "#demo" },
   secondary: { label: "See the audit trail", href: "#solution" },
+};
+
+export const integrations = {
+  eyebrow: "Document intake",
+  title: "Every bill,\ntreated as evidence.",
+  description:
+    "Recourse ingests bills, EOBs, and collections notices — then extracts facts for the audit engine.",
+  items: [
+    { label: "Hospital bills", icon: Invoice01Icon, extracts: "Line items, CPT, dates" },
+    { label: "Insurance EOBs", icon: FileVerifiedIcon, extracts: "Allowed, paid, balance" },
+    { label: "Pharmacy receipts", icon: ReceiptDollarIcon, extracts: "NDC, copay, refills" },
+    { label: "Collections", icon: Legal02Icon, extracts: "Notice date, amount" },
+    { label: "Portal PDFs", icon: FileLinkIcon, extracts: "Invoice metadata" },
+    { label: "Itemized bills", icon: Hospital02Icon, extracts: "Modifiers, NPI" },
+  ] satisfies { label: string; icon: IconSvgElement; extracts: string }[],
 };
 
 export const useCases = {

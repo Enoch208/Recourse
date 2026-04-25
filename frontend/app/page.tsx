@@ -1,10 +1,11 @@
 import { Nav } from "@/components/sections/Nav";
 import { Hero } from "@/components/sections/Hero";
+import { PoweredBy } from "@/components/sections/PoweredBy";
+import { Integrations } from "@/components/sections/Integrations";
 import { UseCases } from "@/components/sections/UseCases";
 import { Automation } from "@/components/sections/Automation";
 import { SampleLetter } from "@/components/sections/SampleLetter";
 import { Footer } from "@/components/sections/Footer";
-import { SectionDivider } from "@/components/primitives/SectionDivider";
 
 export default function Home() {
   return (
@@ -12,10 +13,10 @@ export default function Home() {
       <Nav />
       <main className="flex-1">
         <Hero />
-        <SectionDivider />
+        <PoweredBy />
+        <Integrations />
         <UseCases />
         <Automation />
-        <SectionDivider />
         <SampleLetter />
       </main>
       <Footer />

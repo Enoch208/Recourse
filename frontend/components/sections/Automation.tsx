@@ -39,7 +39,7 @@ export function Automation() {
   return (
     <section
       id="advocates"
-      className="border-t border-border bg-[#FAFAFA]"
+      className="border-t border-border bg-background"
     >
       <Container className="py-24 lg:py-32">
         <motion.div
@@ -51,7 +51,7 @@ export function Automation() {
         >
           <motion.div
             variants={headerRise}
-            className="font-mono text-[10px] uppercase tracking-[0.22em] text-neutral-400"
+            className="font-mono text-[11px] uppercase tracking-[0.18em] text-muted"
           >
             {automation.eyebrow}
           </motion.div>
@@ -94,22 +94,22 @@ export function Automation() {
                   y: -2,
                   transition: { duration: 0.25, ease: EASE },
                 }}
-                className="group relative flex min-h-[240px] flex-col rounded-[8px] border border-neutral-200 bg-white p-6 transition-colors duration-200 hover:border-neutral-400"
+                className="group relative flex min-h-[240px] flex-col rounded-lg border border-border bg-white p-6 transition-colors duration-200 hover:border-border-strong"
               >
                 <div className="flex items-center justify-between">
-                  <span className="inline-flex h-9 w-9 items-center justify-center rounded-[6px] border border-neutral-200 bg-neutral-50 text-ink">
+                  <span className="inline-flex h-9 w-9 items-center justify-center rounded-md border border-border bg-background text-ink">
                     <HugeiconsIcon
                       icon={s.icon}
                       size={15}
                       strokeWidth={1.5}
                     />
                   </span>
-                  <div className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.18em] text-neutral-400">
-                    <span className="inline-flex items-center gap-1 text-emerald-600">
+                  <div className="flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.18em] text-muted">
+                    <span className="inline-flex items-center gap-1 text-emerald-700">
                       <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
                       {s.label}
                     </span>
-                    <span className="text-neutral-300">·</span>
+                    <span className="text-faint">·</span>
                     <span>{s.step}</span>
                   </div>
                 </div>
@@ -122,7 +122,7 @@ export function Automation() {
                 </p>
 
                 <div className="mt-auto pt-6">
-                  <div className="truncate rounded-[5px] border border-neutral-200 bg-neutral-50 px-2.5 py-1.5 font-mono text-[10px] text-neutral-600">
+                  <div className="truncate rounded-md border border-border bg-background px-2.5 py-1.5 font-mono text-[11px] text-muted">
                     {s.hint}
                   </div>
                 </div>

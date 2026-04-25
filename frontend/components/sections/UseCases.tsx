@@ -2,10 +2,23 @@
 
 import { motion } from "motion/react";
 import { Container } from "@/components/primitives/Container";
-import { SectionHeading } from "@/components/primitives/SectionHeading";
 import { useCases } from "@/lib/content";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
+
+const headerStagger = {
+  hidden: {},
+  visible: { transition: { staggerChildren: 0.08, delayChildren: 0.05 } },
+};
+
+const headerRise = {
+  hidden: { opacity: 0, y: 18 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.7, ease: EASE },
+  },
+};
 
 const gridStagger = {
   hidden: {},
@@ -83,23 +96,6 @@ const chipToneMap: Record<
   },
 };
 
-// Per-card aura — only TR (1) and BL (2) get glows; TL (0) and BR (3) stay clean.
-const cardAura: Array<string | null> = [
-  null,
-  // TR — soft sky-blue glow on top-right edge with subtle layering
-  "radial-gradient(70% 60% at 100% 0%, rgba(96,165,250,0.22), transparent 70%)",
-  // BL — mint → lavender on bottom-left edges
-  "radial-gradient(55% 55% at 0% 100%, rgba(52,211,153,0.20), transparent 70%), radial-gradient(65% 65% at 25% 95%, rgba(167,139,250,0.20), transparent 75%)",
-  null,
-];
-
-// TR also gets a "layered drop" — a slightly stronger shadow than the others.
-const cardShadow = [
-  "shadow-[0_1px_2px_rgb(15_23_42/0.03)]",
-  "shadow-[0_18px_42px_rgb(96_165_250/0.10),0_2px_4px_rgb(15_23_42/0.04)]",
-  "shadow-[0_18px_42px_rgb(167_139_250/0.10),0_2px_4px_rgb(15_23_42/0.04)]",
-  "shadow-[0_1px_2px_rgb(15_23_42/0.03)]",
-];
 
 function ChipPanel({ chips }: { chips: Chip[] }) {
   return (
@@ -109,7 +105,7 @@ function ChipPanel({ chips }: { chips: Chip[] }) {
         return (
           <div
             key={c.code}
-            className={`relative overflow-hidden rounded-[8px] border border-black/[0.05] ${tt.tint} px-3 py-2.5 pl-4`}
+            className={`relative overflow-hidden rounded-md border border-border ${tt.tint} px-3 py-2.5 pl-4`}
           >
             <span
               aria-hidden
@@ -120,7 +116,7 @@ function ChipPanel({ chips }: { chips: Chip[] }) {
                 {c.code}
               </span>
               <span
-                className={`inline-flex shrink-0 items-center rounded-[4px] px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-[0.14em] ring-1 ring-inset ${tt.tag}`}
+                className={`inline-flex shrink-0 items-center rounded-sm px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-[0.14em] ring-1 ring-inset ${tt.tag}`}
               >
                 {c.status}
               </span>
@@ -137,24 +133,24 @@ function ChipPanel({ chips }: { chips: Chip[] }) {
 
 function CasePanel({ box }: { box: CaseBox }) {
   return (
-    <div className="mt-auto rounded-[10px] border border-black/[0.05] bg-white p-4 shadow-[0_4px_12px_rgb(15_23_42/0.04)]">
-      <div className="font-mono text-[10px] uppercase tracking-[0.18em] text-muted">
+    <div className="mt-auto rounded-lg border border-border bg-white p-4">
+      <div className="font-mono text-[11px] uppercase tracking-[0.18em] text-muted">
         Case · {box.ref}
       </div>
       <div className="mt-2 text-[15px] font-semibold tracking-tight text-ink">
         {box.title}
       </div>
-      <p className="mt-2 text-[12px] leading-[1.6] text-muted">{box.summary}</p>
+      <p className="mt-2 text-[13px] leading-[1.6] text-muted">{box.summary}</p>
       <div className="mt-4 flex items-center gap-2">
         <button
           type="button"
-          className="inline-flex h-8 items-center rounded-[5px] bg-ink px-3 text-[11px] font-semibold tracking-tight text-white shadow-[0_8px_18px_rgb(0_0_0/0.12)] transition-colors duration-200 hover:bg-[#272727]"
+          className="inline-flex h-8 items-center rounded-md bg-ink px-3 text-[12px] font-semibold tracking-tight text-white transition-colors duration-200 hover:bg-[#272727]"
         >
           {box.primary.label}
         </button>
         <button
           type="button"
-          className="inline-flex h-8 items-center rounded-[5px] border border-border bg-white px-3 text-[11px] font-semibold tracking-tight text-ink transition-colors duration-200 hover:border-border-strong"
+          className="inline-flex h-8 items-center rounded-md border border-border bg-white px-3 text-[12px] font-semibold tracking-tight text-ink transition-colors duration-200 hover:border-border-strong"
         >
           {box.secondary.label}
         </button>
@@ -170,21 +166,12 @@ function UseCaseCard({
   caseBox,
   index,
 }: CardProps) {
-  const aura = cardAura[index % 4];
   return (
     <motion.article
       variants={cardIn}
       whileHover={{ y: -3, transition: { duration: 0.25, ease: EASE } }}
-      className={`group relative flex flex-col overflow-hidden rounded-[14px] border border-black/[0.05] bg-white p-7 lg:p-8 ${cardSpan[index % 4]} ${cardMinH} ${cardShadow[index % 4]}`}
+      className={`group relative flex flex-col overflow-hidden rounded-xl border border-border bg-white p-7 lg:p-8 transition-colors duration-200 hover:border-border-strong ${cardSpan[index % 4]} ${cardMinH}`}
     >
-      {aura && (
-        <div
-          aria-hidden
-          className="pointer-events-none absolute inset-0"
-          style={{ background: aura }}
-        />
-      )}
-
       <div className="relative flex h-full flex-col">
         <h3 className="font-display text-[26px] leading-[1.05] text-ink">
           {title}
@@ -211,12 +198,36 @@ function UseCaseCard({
 
 export function UseCases() {
   return (
-    <section id="statutes" className="border-b border-border bg-surface">
+    <section id="statutes" className="border-t border-b border-border bg-surface">
       <Container className="py-24 lg:py-32">
-        <SectionHeading
-          title={useCases.title}
-          description={useCases.description}
-        />
+        <motion.div
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.25, margin: "0px 0px -80px 0px" }}
+          variants={headerStagger}
+          className="grid gap-10 lg:grid-cols-[1fr_1.08fr] lg:gap-16"
+        >
+          <div>
+            <motion.div
+              variants={headerRise}
+              className="font-mono text-[11px] uppercase tracking-[0.18em] text-muted"
+            >
+              {useCases.eyebrow}
+            </motion.div>
+            <motion.h2
+              variants={headerRise}
+              className="font-display mt-4 whitespace-pre-line text-[36px] leading-[1.02] text-ink sm:text-[44px]"
+            >
+              {useCases.title}
+            </motion.h2>
+          </div>
+          <motion.p
+            variants={headerRise}
+            className="text-[14px] leading-[1.65] text-muted lg:max-w-[440px] lg:self-end"
+          >
+            {useCases.description}
+          </motion.p>
+        </motion.div>
 
         <motion.div
           initial="hidden"

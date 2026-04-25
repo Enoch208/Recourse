@@ -27,7 +27,7 @@ export function Footer() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.15, margin: "0px 0px -40px 0px" }}
           transition={{ duration: 0.7, ease: EASE }}
-          className="rounded-[14px] bg-white px-8 pb-8 pt-10 shadow-[0_1px_2px_rgb(15_23_42/0.03)] lg:px-12 lg:pb-10 lg:pt-12"
+          className="rounded-xl border border-border bg-white px-8 pb-8 pt-10 lg:px-12 lg:pb-10 lg:pt-12"
         >
           <div className="flex flex-col gap-6 sm:flex-row sm:items-start sm:justify-between sm:gap-12">
             <Wordmark />
@@ -67,7 +67,7 @@ export function Footer() {
                     key={s.label}
                     href={s.href}
                     aria-label={s.label}
-                    className="inline-flex h-7 w-7 items-center justify-center rounded-[5px] bg-ink text-white shadow-[0_8px_18px_rgb(0_0_0/0.14)] transition-colors hover:bg-black"
+                    className="inline-flex h-7 w-7 items-center justify-center rounded-md bg-ink text-white transition-colors hover:bg-black"
                   >
                     <HugeiconsIcon
                       icon={s.icon}

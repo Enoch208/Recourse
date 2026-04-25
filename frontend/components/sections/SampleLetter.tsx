@@ -24,7 +24,7 @@ const rise = {
 
 export function SampleLetter() {
   return (
-    <section id="demo" className="border-t border-border bg-[#FAFAFA]">
+    <section id="demo" className="border-t border-border bg-background">
       <Container className="py-24 lg:py-32">
         <motion.div
           initial="hidden"
@@ -36,7 +36,7 @@ export function SampleLetter() {
           <div className="max-w-xl">
             <motion.div
               variants={rise}
-              className="font-mono text-[10px] uppercase tracking-[0.22em] text-neutral-400"
+              className="font-mono text-[11px] uppercase tracking-[0.18em] text-muted"
             >
               Sample output
             </motion.div>
@@ -73,7 +73,7 @@ export function SampleLetter() {
 
             <motion.dl
               variants={rise}
-              className="mt-10 grid grid-cols-3 gap-3 border-t border-neutral-200 pt-6"
+              className="mt-10 grid grid-cols-3 gap-3 border-t border-border pt-6"
             >
               {[
                 ["2", "pages"],
@@ -81,7 +81,7 @@ export function SampleLetter() {
                 ["90s", "drafted in"],
               ].map(([value, label]) => (
                 <div key={label}>
-                  <dt className="font-mono text-[10px] uppercase tracking-[0.18em] text-neutral-400">
+                  <dt className="font-mono text-[11px] uppercase tracking-[0.18em] text-muted">
                     {label}
                   </dt>
                   <dd className="mt-1 font-mono text-[18px] text-ink">
@@ -96,13 +96,9 @@ export function SampleLetter() {
             variants={rise}
             className="relative"
           >
-            <div
-              aria-hidden
-              className="pointer-events-none absolute -inset-4 rounded-[16px] bg-[radial-gradient(55%_55%_at_50%_50%,rgba(15,23,42,0.08),transparent_70%)] blur-xl"
-            />
-            <article className="relative overflow-hidden rounded-[10px] border border-neutral-200 bg-white shadow-[0_30px_80px_rgb(15_23_42/0.10),0_4px_10px_rgb(15_23_42/0.04)]">
+            <article className="relative overflow-hidden rounded-lg border border-border bg-white shadow-[0_1px_2px_rgb(15_23_42/0.04)]">
               <div className="relative px-10 py-10 font-[Georgia] text-[13px] leading-[1.7] text-ink lg:px-14 lg:py-14">
-                <header className="flex items-start justify-between border-b border-neutral-200 pb-6">
+                <header className="flex items-start justify-between border-b border-border pb-6">
                   <div>
                     <div className="font-sans text-[20px] font-bold tracking-tight text-ink">
                       Recourse
@@ -111,24 +107,24 @@ export function SampleLetter() {
                       You have recourse.
                     </div>
                   </div>
-                  <div className="text-right font-mono text-[10px] uppercase tracking-[0.18em] text-neutral-500">
+                  <div className="text-right font-mono text-[11px] uppercase tracking-[0.18em] text-muted">
                     Demand for Recourse
                     <br />
-                    <span className="text-neutral-400">Ref · RCS-48211</span>
+                    <span className="text-faint">Ref · RCS-48211</span>
                   </div>
                 </header>
 
-                <div className="mt-8 space-y-1 font-mono text-[11px] text-neutral-600">
+                <div className="mt-8 space-y-1 font-mono text-[11px] text-muted">
                   <div>
-                    <span className="text-neutral-400">To: </span>
+                    <span className="text-faint">To: </span>
                     Memorial Health System, Patient Accounts
                   </div>
                   <div>
-                    <span className="text-neutral-400">Re: </span>
+                    <span className="text-faint">Re: </span>
                     Account #48211 &mdash; J. Ramirez &mdash; DOS 03/14/2026
                   </div>
                   <div>
-                    <span className="text-neutral-400">Amount in dispute: </span>
+                    <span className="text-faint">Amount in dispute: </span>
                     <span className="text-ink">$8,450.00</span>
                   </div>
                 </div>
@@ -170,11 +166,11 @@ export function SampleLetter() {
 
               <div
                 aria-hidden
-                className="pointer-events-none absolute inset-x-0 bottom-0 h-40 bg-[linear-gradient(180deg,transparent,#FAFAFA_85%)]"
+                className="pointer-events-none absolute inset-x-0 bottom-0 h-40 bg-[linear-gradient(180deg,transparent,var(--color-background)_85%)]"
               />
             </article>
 
-            <div className="mt-4 flex items-center justify-between font-mono text-[10px] uppercase tracking-[0.18em] text-neutral-500">
+            <div className="mt-4 flex items-center justify-between font-mono text-[11px] uppercase tracking-[0.18em] text-muted">
               <span className="inline-flex items-center gap-1.5">
                 <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
                 Verified · NSA · FDCPA · HIPAA

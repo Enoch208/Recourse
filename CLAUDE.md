@@ -38,25 +38,41 @@ Never render a finished letter without first showing the Audit Trail it was buil
 ### Workspace layout
 The core route is `/workspace`, a split screen: **40% left** is the document preview, **60% right** is the Audit Engine (stepper: Scan → Identify → Match → Draft, plus a persistent Statute Panel showing the verified statute library).
 
-### Design system: "Runway Aesthetic" — institutional, paper-like, hyper-credible
+### Design system: "Approachable Institutional" — consumer-friendly, polished, trustworthy
 
-Palette (hex, use with Tailwind arbitrary values or `@theme` tokens):
-- Background `#FAFAFA` · Container `#FFFFFF` · Borders `#E5E7EB` (1px, no heavy shadows)
-- Text primary `#111827` · secondary `#6B7280`
-- Violation accent: `bg-red-50` / `text-red-700` · Match accent: `bg-emerald-50` / `text-emerald-700`
+Recourse balances Pidulteun-tier consumer warmth with statute credibility. Reference points: **Wealthfront × Notion × Ramp** — light, calm, data-rich. Approachable enough that a patient feels safe; institutional enough that an advocate trusts the citations.
+
+The **landing page and the audit terminal** stay institutional (paper-white, sharp 1px borders) because they sell credibility and review live legal documents. The **workspace dashboard, navigation surfaces, and product chrome** adopt the warmer pastel-card register.
+
+Palette:
+- Outer canvas (dashboard surfaces): `#EEF2FB` (soft periwinkle) or `#F5F7FA` (cool gray)
+- Card surface: `#FFFFFF`
+- Borders: `#E5E7EB` (1px) — used sparingly; soft shadows are allowed where they aid hierarchy: `shadow-[0_2px_8px_rgb(15_23_42/0.04)]`
+- Text primary: `#111827` · Muted: `#6B7280`
+- **Mint green** (positive / matches): `#10B981` family — `bg-emerald-50 / text-emerald-700`
+- **Rose** (violations): `#F43F5E` family — `bg-rose-50 / text-rose-700`
+- **Warm amber/yellow** (primary CTAs in product chrome): `#FBBF24` family — `bg-amber-400 hover:bg-amber-500`
+- **Sky** (in-progress / neutral state): `bg-sky-50 / text-sky-700`
+
+Radius:
+- Cards: `rounded-2xl` (16px) for product chrome / dashboard
+- Inline pills: `rounded-md` (6px)
+- Big surface frames (the outer dashboard card): `rounded-3xl` (24px)
 
 Typography:
-- **Satoshi** (variable) for UI — wordmarks use Satoshi-Bold with `tracking-tighter`. Load via Fontshare CSS `@import`.
-- **Geist Mono** / JetBrains Mono for citations and monetary values.
+- **Satoshi** for UI — load via Fontshare CSS `@import`. Wordmarks use Satoshi-Bold with `tracking-tighter`.
+- **Editorial serif (Georgia)** sparingly, for emotional accents only — hero headline, eyebrow tagline, letter masthead.
+- **Geist Mono / JetBrains Mono** strictly for legal citations and monetary values — never decoratively.
 
-Icons: **Hugeicons** (`hugeicons-react`), outline variants, 1.5–2px stroke.
+Icons: **Hugeicons** (`@hugeicons/react`), outline variants, 1.5px stroke, primary color `#111827` unless tinted by tone.
 
 ### Hard rules
 - **No dark mode.** Legibility over theming.
-- **No neon, gradients, glow effects, or purple/blue blurs** — avoid Web3 aesthetics.
-- **No playful copy or emojis.** Use "Analyzing Document…", "Verifying Statute Match", not "Hacking your bill!".
-- **No pill buttons.** Use `rounded-md` — feels like an official tool.
-- **Redline accents for violations, verified-green for matches** — never invert.
+- **No neon, no glow effects, no purple/blue blurs.** Tasteful pastel gradients on illustrations are fine; avoid anything that reads "Web3."
+- **Adult, calm copy.** No "Let's go!" or "Boom!" or emojis. "Analyzing Document…" not "Hacking your bill!". Friendly is fine; childish is not.
+- **Statute citations + dollar amounts always in mono.** Never sans.
+- **Status colors are semantic, not decorative.** Rose = violation. Emerald = match. Amber = pending/warning. Sky = in-progress. Never invert.
+- **The audit terminal and the demand letter remain institutional.** Sharp 1px borders, no shadows, mono everywhere. Friendly chrome, formal evidence.
 
 ### Demo artifact
 A "Memorial Health" mock bill is the canonical demo input — the Kill Shot is the specific dollar amount recovered or platform fee avoided. Closing line: *"We don't provide legal advice; we provide a path to recourse."*

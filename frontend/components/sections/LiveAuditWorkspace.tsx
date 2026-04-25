@@ -17,6 +17,7 @@ type LineVariant = "violation" | "match";
 type AuditLine = {
   icon: IconSvgElement;
   title: string;
+  detail: string;
   statute: string;
   meta: string;
   variant: LineVariant;
@@ -26,6 +27,7 @@ const auditLines: AuditLine[] = [
   {
     icon: BalanceScaleIcon,
     title: "Out-of-network facility fee",
+    detail: "Balance-bill exposure identified",
     statute: "NSA § 2799A-1",
     meta: "$8,450",
     variant: "violation",
@@ -33,6 +35,7 @@ const auditLines: AuditLine[] = [
   {
     icon: Invoice01Icon,
     title: "Duplicate CPT 99213 charge",
+    detail: "Same provider, same service date",
     statute: "CPT 99213",
     meta: "× 2",
     variant: "violation",
@@ -40,6 +43,7 @@ const auditLines: AuditLine[] = [
   {
     icon: FileVerifiedIcon,
     title: "Validation window active",
+    detail: "Collector response clock is open",
     statute: "FDCPA § 1692g",
     meta: "29 days",
     variant: "match",
@@ -47,6 +51,7 @@ const auditLines: AuditLine[] = [
   {
     icon: Stamp02Icon,
     title: "Itemized statement verified",
+    detail: "Records request evidence attached",
     statute: "HIPAA § 164.524",
     meta: "READY",
     variant: "match",
@@ -59,21 +64,26 @@ const HOLD_DURATION = 3200;
 
 const variantStyles: Record<
   LineVariant,
-  { chip: string; dot: string; iconTint: string }
+  { chip: string; dot: string; iconTint: string; iconBox: string; row: string }
 > = {
   violation: {
     chip: "bg-rose-50 text-rose-700 ring-rose-100",
     dot: "bg-rose-500",
     iconTint: "text-rose-600",
+    iconBox: "border-rose-100 bg-rose-50/80",
+    row: "border-rose-100/80 bg-[linear-gradient(180deg,#fff,#fff7f8)]",
   },
   match: {
     chip: "bg-emerald-50 text-emerald-700 ring-emerald-100",
     dot: "bg-emerald-500",
     iconTint: "text-emerald-600",
+    iconBox: "border-emerald-100 bg-emerald-50/80",
+    row: "border-emerald-100/80 bg-[linear-gradient(180deg,#fff,#f7fffb)]",
   },
 };
 
 const EASE = [0.22, 1, 0.36, 1] as const;
+const documentLines = [94, 72, 88, 63, 78, 52];
 
 function useAuditCycle() {
   const [visible, setVisible] = useState(0);
@@ -108,25 +118,21 @@ function useAuditCycle() {
 
 export function LiveAuditWorkspace() {
   const { visible, done, progress } = useAuditCycle();
+  const matched = Math.min(visible, auditLines.length);
 
   return (
-    <div className="relative w-full max-w-[640px]">
-      <div
-        aria-hidden
-        className="pointer-events-none absolute -inset-6 rounded-[22px] bg-[radial-gradient(60%_60%_at_50%_50%,rgba(15,23,42,0.10),transparent_70%)] blur-2xl"
-      />
-
-      <div className="relative overflow-hidden rounded-[14px] border border-[#dedbd3] bg-white shadow-[0_30px_80px_rgb(15_23_42/0.14),0_8px_20px_rgb(15_23_42/0.05)] ring-1 ring-black/[0.04]">
-        <div className="flex items-center justify-between border-b border-border bg-[#fbfbf9] px-4 py-2.5">
+    <div className="relative w-full max-w-[690px] min-w-0">
+      <div className="relative overflow-hidden rounded-2xl border border-border-strong bg-white shadow-[0_18px_48px_rgb(15_23_42/0.08),0_2px_6px_rgb(15_23_42/0.04)]">
+        <div className="flex h-11 items-center justify-between border-b border-border bg-background px-3.5 sm:px-4">
           <div className="flex items-center gap-1.5">
-            <span className="h-2.5 w-2.5 rounded-full bg-[#ff5f57]" />
-            <span className="h-2.5 w-2.5 rounded-full bg-[#febc2e]" />
-            <span className="h-2.5 w-2.5 rounded-full bg-[#28c840]" />
+            <span className="h-2.5 w-2.5 rounded-full bg-[#ff5f57] shadow-[inset_0_-1px_1px_rgb(0_0_0/0.16)]" />
+            <span className="h-2.5 w-2.5 rounded-full bg-[#febc2e] shadow-[inset_0_-1px_1px_rgb(0_0_0/0.16)]" />
+            <span className="h-2.5 w-2.5 rounded-full bg-[#28c840] shadow-[inset_0_-1px_1px_rgb(0_0_0/0.16)]" />
           </div>
-          <div className="rounded-full border border-border bg-white px-3 py-0.5 font-mono text-[9px] uppercase tracking-[0.18em] text-neutral-500">
+          <div className="hidden rounded-md border border-border bg-white px-3 py-1 font-mono text-[10px] uppercase tracking-[0.18em] text-muted sm:block">
             Audit Workspace / Memorial Health #48211
           </div>
-          <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-2 py-0.5 font-mono text-[9px] uppercase tracking-[0.16em] text-emerald-700 ring-1 ring-inset ring-emerald-100">
+          <span className="inline-flex items-center gap-1.5 rounded-md bg-emerald-50 px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.16em] text-emerald-700 ring-1 ring-inset ring-emerald-100">
             <motion.span
               className="h-1.5 w-1.5 rounded-full bg-emerald-500"
               animate={{ opacity: [1, 0.4, 1] }}
@@ -136,52 +142,81 @@ export function LiveAuditWorkspace() {
           </span>
         </div>
 
-        <div className="grid grid-cols-5">
-          <aside className="col-span-2 border-r border-border bg-[#fbfbf9] p-4">
-            <div className="font-mono text-[9px] uppercase tracking-[0.18em] text-neutral-400">
-              Document
+        <div className="grid min-h-[372px] grid-cols-1 sm:grid-cols-[0.76fr_1.24fr]">
+          <aside className="border-b border-border bg-background p-3.5 sm:border-b-0 sm:border-r sm:p-4">
+            <div className="flex items-center justify-between">
+              <div className="font-mono text-[10px] uppercase tracking-[0.18em] text-muted">
+                Document
+              </div>
+              <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-muted">
+                OCR 98.4
+              </span>
             </div>
-            <div className="mt-3 rounded-[7px] border border-border bg-white p-3 shadow-[0_8px_20px_rgb(15_23_42/0.04)]">
-              <div className="flex items-center justify-between">
-                <div className="text-[11px] font-semibold text-ink">
-                  Memorial Health
+
+            <div className="mt-3 rounded-lg border border-border bg-white p-3">
+              <div className="flex items-start justify-between gap-3">
+                <div className="min-w-0">
+                  <div className="truncate text-[11px] font-semibold text-ink">
+                    Memorial Health
+                  </div>
+                  <div className="mt-1 font-mono text-[10px] uppercase tracking-[0.14em] text-muted">
+                    Invoice #48211
+                  </div>
                 </div>
-                <span className="font-mono text-[9px] text-neutral-500">
-                  #48211
+                <span className="rounded-sm border border-border bg-background px-2 py-0.5 font-mono text-[10px] uppercase tracking-[0.14em] text-muted">
+                  PDF
                 </span>
               </div>
-              <div className="mt-3 space-y-1.5">
-                {[92, 78, 64, 88, 55].map((w, i) => (
-                  <div
-                    key={i}
-                    className="h-1 rounded-sm bg-border"
-                    style={{ width: `${w}%` }}
+
+              <div className="relative mt-3 overflow-hidden rounded-md border border-border bg-background p-2.5">
+                {!done && (
+                  <motion.div
+                    aria-hidden
+                    className="absolute inset-x-0 h-8 bg-[linear-gradient(180deg,transparent,rgba(16,185,129,0.10),transparent)]"
+                    initial={{ y: -34 }}
+                    animate={{ y: 112 }}
+                    transition={{
+                      duration: 2.2,
+                      repeat: Infinity,
+                      ease: "easeInOut",
+                    }}
                   />
-                ))}
+                )}
+                <div className="relative space-y-1.5">
+                  {documentLines.map((w, i) => (
+                    <div
+                      key={i}
+                      className="h-1.5 rounded-full bg-border-strong"
+                      style={{ width: `${w}%`, opacity: 0.96 - i * 0.08 }}
+                    />
+                  ))}
+                </div>
               </div>
+
               <div className="mt-4 grid grid-cols-2 gap-2">
-                <div className="rounded-[5px] border border-border bg-[#fbfbf9] p-2">
-                  <div className="font-mono text-[8px] uppercase tracking-[0.16em] text-neutral-400">
+                <div className="rounded-md border border-border bg-background p-2.5">
+                  <div className="font-mono text-[10px] uppercase tracking-[0.15em] text-muted">
                     Balance
                   </div>
-                  <div className="mt-1 font-mono text-[11px] text-ink">
+                  <div className="mt-1 font-mono text-[12px] text-ink tabular-nums">
                     $12,480
                   </div>
                 </div>
-                <div className="rounded-[5px] border border-border bg-[#fbfbf9] p-2">
-                  <div className="font-mono text-[8px] uppercase tracking-[0.16em] text-neutral-400">
+                <div className="rounded-md border border-border bg-background p-2.5">
+                  <div className="font-mono text-[10px] uppercase tracking-[0.15em] text-muted">
                     Service
                   </div>
-                  <div className="mt-1 font-mono text-[11px] text-ink">
+                  <div className="mt-1 font-mono text-[12px] text-ink tabular-nums">
                     03/14/2026
                   </div>
                 </div>
               </div>
-              <div className="mt-3 rounded-[5px] bg-white p-2 ring-1 ring-inset ring-border">
-                <div className="flex items-center justify-between font-mono text-[8px] uppercase tracking-[0.12em] text-neutral-400">
+
+              <div className="mt-3 rounded-md bg-white p-2.5 ring-1 ring-inset ring-border">
+                <div className="flex items-center justify-between font-mono text-[10px] uppercase tracking-[0.14em] text-muted">
                   <span>Rules matched</span>
                   <span>
-                    {visible}/{auditLines.length}
+                    {matched}/{auditLines.length}
                   </span>
                 </div>
                 <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-border">
@@ -195,12 +230,12 @@ export function LiveAuditWorkspace() {
             </div>
           </aside>
 
-          <div className="col-span-3 bg-white p-4">
+          <div className="min-w-0 bg-white p-3.5 sm:p-4">
             <div className="flex items-center justify-between">
-              <div className="font-mono text-[9px] uppercase tracking-[0.18em] text-neutral-400">
+              <div className="font-mono text-[10px] uppercase tracking-[0.18em] text-muted">
                 Audit Trail
               </div>
-              <span className="inline-flex items-center gap-1.5 font-mono text-[9px] uppercase tracking-[0.16em] text-emerald-700">
+              <span className="inline-flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-[0.16em] text-emerald-700">
                 <motion.span
                   className="h-1.5 w-1.5 rounded-full bg-emerald-500"
                   animate={{ opacity: [1, 0.3, 1] }}
@@ -214,7 +249,7 @@ export function LiveAuditWorkspace() {
               </span>
             </div>
 
-            <ul className="mt-3 space-y-2 min-h-[180px]">
+            <ul className="mt-3 min-h-[252px] space-y-2">
               <AnimatePresence mode="popLayout">
                 {auditLines.slice(0, visible).map((line) => {
                   const v = variantStyles[line.variant];
@@ -226,29 +261,46 @@ export function LiveAuditWorkspace() {
                       animate={{ opacity: 1, x: 0 }}
                       exit={{ opacity: 0, x: -12 }}
                       transition={{ duration: 0.45, ease: EASE }}
-                      className="flex items-center justify-between rounded-[7px] border border-border bg-[#fbfbf9] px-3 py-2"
+                      className={`relative min-h-[58px] overflow-hidden rounded-md border px-3 py-2.5 ${v.row}`}
                     >
-                      <div className="flex min-w-0 items-center gap-2.5">
-                        <HugeiconsIcon
-                          icon={line.icon}
-                          size={13}
-                          strokeWidth={1.5}
-                          className={v.iconTint}
-                        />
-                        <span className="truncate text-[11px] text-ink">
-                          {line.title}
-                        </span>
-                      </div>
-                      <div className="flex items-center gap-2">
+                      <span
+                        aria-hidden
+                        className={`absolute bottom-2 left-0 top-2 w-[2px] rounded-r-full ${v.dot}`}
+                      />
+                      <div className="flex min-w-0 items-start gap-2.5">
                         <span
-                          className={`inline-flex items-center gap-1 rounded-[4px] px-1.5 py-0.5 font-mono text-[8px] uppercase tracking-[0.14em] ring-1 ring-inset ${v.chip}`}
+                          className={`mt-0.5 inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-md border ${v.iconBox}`}
                         >
-                          <span className={`h-1 w-1 rounded-full ${v.dot}`} />
-                          {line.statute}
+                          <HugeiconsIcon
+                            icon={line.icon}
+                            size={13}
+                            strokeWidth={1.6}
+                            className={v.iconTint}
+                          />
                         </span>
-                        <span className="hidden font-mono text-[9px] text-neutral-500 sm:inline">
-                          {line.meta}
-                        </span>
+                        <div className="min-w-0 flex-1">
+                          <div className="flex min-w-0 items-center justify-between gap-2">
+                            <span className="truncate text-[11px] font-semibold tracking-[-0.01em] text-ink">
+                              {line.title}
+                            </span>
+                            <span className="shrink-0 font-mono text-[9px] text-neutral-500 tabular-nums">
+                              {line.meta}
+                            </span>
+                          </div>
+                          <div className="mt-1.5 flex min-w-0 items-center justify-between gap-2">
+                            <span className="truncate text-[10px] leading-none text-muted">
+                              {line.detail}
+                            </span>
+                            <span
+                              className={`inline-flex shrink-0 items-center gap-1 rounded-sm px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-[0.13em] ring-1 ring-inset ${v.chip}`}
+                            >
+                              <span
+                                className={`h-1 w-1 rounded-full ${v.dot}`}
+                              />
+                              {line.statute}
+                            </span>
+                          </div>
+                        </div>
                       </div>
                     </motion.li>
                   );
@@ -264,21 +316,30 @@ export function LiveAuditWorkspace() {
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: 10 }}
                   transition={{ duration: 0.5, ease: EASE }}
-                  className="mt-3 flex items-center justify-between rounded-[7px] bg-ink px-3 py-2.5 text-white shadow-[0_18px_38px_rgb(0_0_0/0.16)]"
+                  className="mt-3 flex min-h-[58px] items-center rounded-md bg-ink px-3.5 py-3 text-white"
                 >
-                  <div className="flex items-center gap-2.5">
-                    <HugeiconsIcon
-                      icon={SignatureIcon}
-                      size={13}
-                      strokeWidth={1.75}
-                    />
-                    <span className="text-[11px] font-semibold">
-                      Demand letter drafted
+                  <div className="flex min-w-0 flex-1 items-center gap-2.5">
+                    <span className="inline-flex h-7 w-7 items-center justify-center rounded-md bg-white/10 text-white ring-1 ring-inset ring-white/10">
+                      <HugeiconsIcon
+                        icon={SignatureIcon}
+                        size={13}
+                        strokeWidth={1.75}
+                      />
                     </span>
+                    <div className="min-w-0 flex-1">
+                      <div className="flex min-w-0 items-center justify-between gap-2">
+                        <span className="truncate text-[11px] font-semibold">
+                          Demand letter drafted
+                        </span>
+                        <span className="shrink-0 font-mono text-[10px] uppercase tracking-[0.16em] text-white/70">
+                          Ready
+                        </span>
+                      </div>
+                      <div className="mt-1 truncate font-mono text-[10px] uppercase tracking-[0.14em] text-white/60">
+                        2 pages · packet compiled
+                      </div>
+                    </div>
                   </div>
-                  <span className="font-mono text-[8px] uppercase tracking-[0.16em] text-white/70">
-                    2 pages · ready
-                  </span>
                 </motion.div>
               )}
             </AnimatePresence>

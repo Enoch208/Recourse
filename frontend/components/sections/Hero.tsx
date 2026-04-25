@@ -36,15 +36,7 @@ export function Hero() {
         aria-hidden
         className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_60%_55%_at_50%_50%,rgba(255,255,255,0.72),rgba(255,255,255,0.25)_55%,transparent_80%)]"
       />
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-x-0 bottom-0 h-40 bg-[linear-gradient(180deg,transparent,rgba(255,255,255,0.88))]"
-      />
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-x-0 bottom-0 h-px bg-[linear-gradient(90deg,transparent,rgba(13,13,13,0.14),transparent)]"
-      />
-      <Container className="relative grid min-w-0 items-center gap-12 py-20 sm:py-24 lg:grid-cols-2 lg:gap-16 lg:py-28">
+      <Container className="relative grid min-w-0 items-center gap-12 py-24 lg:grid-cols-2 lg:gap-16 lg:py-32">
         <motion.div
           className="flex min-w-0 flex-col"
           initial="hidden"
@@ -53,7 +45,7 @@ export function Hero() {
         >
           <motion.span
             variants={riseIn}
-            className="inline-flex w-fit items-center gap-2 rounded-[5px] border border-emerald-200/70 bg-white/75 px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.18em] text-muted shadow-[0_10px_28px_rgb(16_185_129/0.08)] backdrop-blur"
+            className="inline-flex w-fit items-center gap-2 rounded-md border border-border bg-white px-2.5 py-1 font-mono text-[11px] uppercase tracking-[0.18em] text-muted"
           >
             <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
             {hero.eyebrow}
@@ -68,7 +60,7 @@ export function Hero() {
 
           <motion.p
             variants={riseIn}
-            className="font-[Georgia] mt-4 text-[13px] italic text-neutral-500"
+            className="font-[Georgia] mt-4 text-[13px] italic text-muted"
           >
             Not legal advice — a path to recourse.
           </motion.p>
@@ -90,7 +82,7 @@ export function Hero() {
               </span>
               <span>median refund secured</span>
             </span>
-            <span className="hidden text-neutral-300 sm:inline">·</span>
+            <span className="hidden text-faint sm:inline">·</span>
             <span className="inline-flex items-baseline gap-1.5">
               <span className="font-mono text-[17px] font-semibold tracking-tight text-ink">
                 73%
