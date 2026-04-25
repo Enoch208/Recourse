@@ -42,7 +42,13 @@ export function Nav() {
               ))}
             </nav>
           </div>
-          <div className="hidden sm:block">
+          <div className="hidden items-center gap-5 sm:flex">
+            <Link
+              href={nav.signIn.href}
+              className="text-[13px] text-muted transition-colors duration-200 hover:text-ink"
+            >
+              {nav.signIn.label}
+            </Link>
             <Button href={nav.cta.href} size="sm">
               {nav.cta.label}
             </Button>

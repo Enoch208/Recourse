@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { usePathname } from "next/navigation";
 import { motion } from "motion/react";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
@@ -21,17 +22,22 @@ type NavItem = {
   label: string;
   href: string;
   icon: IconSvgElement;
-  active?: boolean;
   count?: number;
 };
 
 const primaryNav: NavItem[] = [
-  { label: "Summary", href: "/workspace", icon: DashboardCircleIcon, active: true },
+  { label: "Summary", href: "/workspace", icon: DashboardCircleIcon },
   { label: "Bills", href: "/workspace/bills", icon: Invoice01Icon, count: 8 },
   { label: "Statutes", href: "/workspace/statutes", icon: BalanceScaleIcon, count: 47 },
   { label: "Resolved", href: "/workspace/resolved", icon: TickDouble02Icon, count: 12 },
   { label: "Settings", href: "/workspace/settings", icon: Settings02Icon },
 ];
+
+function isActive(pathname: string | null, href: string) {
+  if (!pathname) return false;
+  if (href === "/workspace") return pathname === "/workspace";
+  return pathname === href || pathname.startsWith(href + "/");
+}
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 const EXPANDED_WIDTH = 232;
@@ -39,6 +45,7 @@ const COLLAPSED_WIDTH = 72;
 
 export function Sidebar() {
   const [collapsed, setCollapsed] = useState(false);
+  const pathname = usePathname();
 
   return (
     <motion.aside
@@ -76,35 +83,38 @@ export function Sidebar() {
       </div>
 
       <nav className="mt-5 flex flex-col gap-1 px-3">
-        {primaryNav.map((item) => (
-          <Link
-            key={item.href}
-            href={item.href}
-            title={collapsed ? item.label : undefined}
-            aria-label={collapsed ? item.label : undefined}
-            className={`group flex h-10 items-center rounded-[10px] text-[13px] tracking-tight transition-colors duration-150 ${
-              collapsed ? "justify-center" : "justify-between px-3"
-            } ${
-              item.active
-                ? "bg-emerald-50 text-emerald-700"
-                : "text-neutral-500 hover:bg-neutral-50 hover:text-ink"
-            }`}
-          >
-            <span className={`flex items-center ${collapsed ? "" : "gap-3"}`}>
-              <HugeiconsIcon icon={item.icon} size={16} strokeWidth={1.5} />
-              {!collapsed && <span>{item.label}</span>}
-            </span>
-            {!collapsed && typeof item.count === "number" && (
-              <span
-                className={`font-mono text-[10px] tracking-[0.1em] ${
-                  item.active ? "text-emerald-600" : "text-neutral-400"
-                }`}
-              >
-                {item.count}
+        {primaryNav.map((item) => {
+          const active = isActive(pathname, item.href);
+          return (
+            <Link
+              key={item.href}
+              href={item.href}
+              title={collapsed ? item.label : undefined}
+              aria-label={collapsed ? item.label : undefined}
+              className={`group flex h-10 items-center rounded-[10px] text-[13px] tracking-tight transition-colors duration-150 ${
+                collapsed ? "justify-center" : "justify-between px-3"
+              } ${
+                active
+                  ? "bg-emerald-50 text-emerald-700"
+                  : "text-neutral-500 hover:bg-neutral-50 hover:text-ink"
+              }`}
+            >
+              <span className={`flex items-center ${collapsed ? "" : "gap-3"}`}>
+                <HugeiconsIcon icon={item.icon} size={16} strokeWidth={1.5} />
+                {!collapsed && <span>{item.label}</span>}
               </span>
-            )}
-          </Link>
-        ))}
+              {!collapsed && typeof item.count === "number" && (
+                <span
+                  className={`font-mono text-[10px] tracking-[0.1em] ${
+                    active ? "text-emerald-600" : "text-neutral-400"
+                  }`}
+                >
+                  {item.count}
+                </span>
+              )}
+            </Link>
+          );
+        })}
       </nav>
 
       <div className="mt-4 px-3">

@@ -1,11 +1,11 @@
 "use client";
 
+import Image from "next/image";
 import { motion } from "motion/react";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { ArrowRight01Icon } from "@hugeicons/core-free-icons";
 import { Container } from "@/components/primitives/Container";
 import { Button } from "@/components/primitives/Button";
-import { LiveAuditWorkspace } from "./LiveAuditWorkspace";
 import { hero } from "@/lib/content";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
@@ -115,7 +115,16 @@ export function Hero() {
           animate={{ opacity: 1, y: 0, scale: 1 }}
           transition={{ duration: 1, delay: 0.25, ease: EASE }}
         >
-          <LiveAuditWorkspace />
+          <div className="relative w-full max-w-[690px] overflow-hidden rounded-2xl border border-border-strong bg-white shadow-[0_18px_48px_rgb(15_23_42/0.08),0_2px_6px_rgb(15_23_42/0.04)]">
+            <Image
+              src="/better_hero.png"
+              alt="Recourse workspace — My Summary dashboard with active disputes and recovery progress"
+              width={1570}
+              height={1001}
+              priority
+              className="h-auto w-full"
+            />
+          </div>
         </motion.div>
       </Container>
     </section>

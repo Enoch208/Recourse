@@ -58,15 +58,15 @@ export function SampleLetter() {
             </motion.p>
 
             <motion.div variants={rise} className="mt-8 flex items-center gap-3">
-              <Button href="#demo">
-                Request demo
+              <Button href="/signup">
+                Try now
                 <HugeiconsIcon
                   icon={ArrowRight01Icon}
                   size={16}
                   strokeWidth={1.5}
                 />
               </Button>
-              <Button href="#demo" variant="secondary">
+              <Button href="/workspace/audit" variant="secondary">
                 See full letter
               </Button>
             </motion.div>
