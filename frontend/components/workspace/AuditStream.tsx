@@ -4,9 +4,11 @@ import { motion, AnimatePresence } from "motion/react";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
   Tick02Icon,
+  TickDouble02Icon,
   Alert02Icon,
   ArrowRight01Icon,
   RefreshIcon,
+  Cancel01Icon,
 } from "@hugeicons/core-free-icons";
 import type { AuditPhase } from "@/lib/audit/events";
 import type { BillFacts, Finding } from "@/lib/audit/schema";
@@ -26,6 +28,8 @@ export type StreamState =
   | "streaming"
   | "drafting"
   | "done"
+  | "verified-clean"
+  | "rejected"
   | "error";
 
 type Props = {
@@ -35,6 +39,7 @@ type Props = {
   draftBody: string;
   state: StreamState;
   error?: string | null;
+  rejectionMessage?: string | null;
   onReplay?: () => void;
   auditId?: string;
 };
@@ -255,6 +260,113 @@ function DraftLetter({
   );
 }
 
+function VerifiedCleanState({
+  facts,
+  onReplay,
+}: {
+  facts: BillFacts | null;
+  onReplay?: () => void;
+}) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 16 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.6, ease: EASE }}
+      className="flex h-full flex-col items-center justify-center px-8 py-12 text-center"
+    >
+      <span className="inline-flex h-14 w-14 items-center justify-center rounded-full bg-emerald-50 text-emerald-700">
+        <HugeiconsIcon icon={TickDouble02Icon} size={22} strokeWidth={2} />
+      </span>
+      <div className="mt-5 font-mono text-[10px] uppercase tracking-[0.2em] text-emerald-700">
+        Verified Clean
+      </div>
+      <h3 className="mt-2 font-display text-[20px] tracking-tight text-ink">
+        No statute violations detected
+      </h3>
+      <p className="mt-3 max-w-[420px] text-[13px] leading-relaxed text-neutral-500">
+        {facts ? (
+          <>
+            This bill from <span className="text-ink">{facts.provider.name}</span>{" "}
+            appears compliant with the federal protections Recourse audits — NSA,
+            FDCPA, ERISA, and HIPAA.
+          </>
+        ) : (
+          "This bill appears compliant with the federal protections Recourse audits — NSA, FDCPA, ERISA, and HIPAA."
+        )}
+      </p>
+      <div className="mt-6 grid w-full max-w-[420px] grid-cols-2 gap-3 text-left">
+        <div className="rounded-[12px] border border-neutral-200 bg-white p-4">
+          <div className="font-mono text-[9px] uppercase tracking-[0.18em] text-neutral-400">
+            Recoverable
+          </div>
+          <div className="mt-1 font-mono text-[18px] tracking-tight text-ink">
+            $0.00
+          </div>
+        </div>
+        <div className="rounded-[12px] border border-neutral-200 bg-white p-4">
+          <div className="font-mono text-[9px] uppercase tracking-[0.18em] text-neutral-400">
+            Library checked
+          </div>
+          <div className="mt-1 font-mono text-[12px] tracking-tight text-ink">
+            v1.4 · 7 statutes
+          </div>
+        </div>
+      </div>
+      {onReplay && (
+        <button
+          type="button"
+          onClick={onReplay}
+          className="mt-6 inline-flex items-center gap-1.5 rounded-[3px] border border-neutral-200 bg-white px-3 py-1.5 font-mono text-[10px] uppercase tracking-[0.16em] text-neutral-500 transition-colors hover:border-neutral-400 hover:text-ink"
+        >
+          <HugeiconsIcon icon={RefreshIcon} size={11} strokeWidth={1.75} />
+          Run another audit
+        </button>
+      )}
+    </motion.div>
+  );
+}
+
+function RejectedState({
+  message,
+  onReplay,
+}: {
+  message?: string | null;
+  onReplay?: () => void;
+}) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 16 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.6, ease: EASE }}
+      className="flex h-full flex-col items-center justify-center px-8 py-12 text-center"
+    >
+      <span className="inline-flex h-14 w-14 items-center justify-center rounded-full bg-neutral-100 text-neutral-500">
+        <HugeiconsIcon icon={Cancel01Icon} size={20} strokeWidth={1.75} />
+      </span>
+      <div className="mt-5 font-mono text-[10px] uppercase tracking-[0.2em] text-neutral-500">
+        Not Recognized
+      </div>
+      <h3 className="mt-2 font-display text-[20px] tracking-tight text-ink">
+        We couldn&apos;t classify this document
+      </h3>
+      <p className="mt-3 max-w-[440px] text-[13px] leading-relaxed text-neutral-500">
+        {message ??
+          "Recourse currently audits US medical bills, EOBs, collections notices, and denial letters. Try uploading one of those."}
+      </p>
+      {onReplay && (
+        <button
+          type="button"
+          onClick={onReplay}
+          className="mt-6 inline-flex items-center gap-1.5 rounded-[10px] bg-amber-400 px-4 py-2 text-[12px] font-semibold tracking-tight text-ink shadow-[0_2px_8px_rgb(251_191_36/0.35)] transition-colors hover:bg-amber-500"
+        >
+          <HugeiconsIcon icon={RefreshIcon} size={12} strokeWidth={1.75} />
+          Try a different document
+        </button>
+      )}
+    </motion.div>
+  );
+}
+
 export function AuditStream({
   facts,
   events,
@@ -262,10 +374,13 @@ export function AuditStream({
   draftBody,
   state,
   error,
+  rejectionMessage,
   onReplay,
   auditId,
 }: Props) {
   const showDraft = state === "drafting" || state === "done";
+  const showVerifiedClean = state === "verified-clean";
+  const showRejected = state === "rejected";
   const isStreaming = state === "drafting";
   const totalRecoverable = findings.reduce(
     (sum, f) => sum + f.recoverableAmount,
@@ -279,25 +394,55 @@ export function AuditStream({
           <h2 className="font-display text-[20px] tracking-tight text-ink">
             Recourse Audit
           </h2>
-          <span className="h-4 w-px bg-neutral-300" />
-          <span className="inline-flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-[0.18em] text-emerald-700">
-            <motion.span
-              className={`h-1.5 w-1.5 rounded-full ${
-                state === "error" ? "bg-rose-500" : "bg-emerald-500"
-              }`}
-              animate={state === "streaming" ? { opacity: [1, 0.35, 1] } : { opacity: 1 }}
-              transition={{ duration: 1.4, repeat: Infinity, ease: "easeInOut" }}
-            />
-            {state === "error"
-              ? "Failed"
-              : state === "done"
-                ? "Draft Ready"
-                : state === "drafting"
-                  ? "Drafting Letter"
-                  : state === "streaming"
-                    ? "Live Streaming"
-                    : "Idle"}
-          </span>
+          {showVerifiedClean ? (
+            <>
+              <span className="h-4 w-px bg-neutral-300" />
+              <span className="inline-flex items-center gap-1.5 rounded-md bg-emerald-50 px-2 py-0.5 font-mono text-[10px] uppercase tracking-[0.18em] text-emerald-700">
+                <HugeiconsIcon icon={TickDouble02Icon} size={11} strokeWidth={2} />
+                Verified Clean
+              </span>
+            </>
+          ) : showRejected ? (
+            <>
+              <span className="h-4 w-px bg-neutral-300" />
+              <span className="inline-flex items-center gap-1.5 rounded-md bg-neutral-100 px-2 py-0.5 font-mono text-[10px] uppercase tracking-[0.18em] text-neutral-600">
+                <HugeiconsIcon icon={Cancel01Icon} size={11} strokeWidth={1.75} />
+                Not Recognized
+              </span>
+            </>
+          ) : state !== "done" ? (
+            <>
+              <span className="h-4 w-px bg-neutral-300" />
+              <span
+                className={`inline-flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-[0.18em] ${
+                  state === "error" ? "text-rose-700" : "text-emerald-700"
+                }`}
+              >
+                <motion.span
+                  className={`h-1.5 w-1.5 rounded-full ${
+                    state === "error" ? "bg-rose-500" : "bg-emerald-500"
+                  }`}
+                  animate={
+                    state === "streaming" || state === "drafting"
+                      ? { opacity: [1, 0.35, 1] }
+                      : { opacity: 1 }
+                  }
+                  transition={{
+                    duration: 1.4,
+                    repeat: Infinity,
+                    ease: "easeInOut",
+                  }}
+                />
+                {state === "error"
+                  ? "Failed"
+                  : state === "drafting"
+                    ? "Drafting Letter"
+                    : state === "streaming"
+                      ? "Live Streaming"
+                      : "Idle"}
+              </span>
+            </>
+          ) : null}
         </div>
         <div className="flex items-center gap-3 font-mono text-[10px] uppercase tracking-[0.18em] text-neutral-400">
           {totalRecoverable > 0 && (
@@ -305,15 +450,23 @@ export function AuditStream({
               {usd(totalRecoverable)} recoverable
             </span>
           )}
-          {totalRecoverable > 0 && <span className="hidden h-4 w-px bg-neutral-300 sm:block" />}
-          <span>
-            {findings.length} citation{findings.length === 1 ? "" : "s"}
-          </span>
+          {totalRecoverable > 0 && (
+            <span className="hidden h-4 w-px bg-neutral-300 sm:block" />
+          )}
+          {!showRejected && (
+            <span>
+              {findings.length} citation{findings.length === 1 ? "" : "s"}
+            </span>
+          )}
         </div>
       </header>
 
       <div className="relative flex-1 overflow-y-auto">
-        {state === "error" ? (
+        {showVerifiedClean ? (
+          <VerifiedCleanState facts={facts} onReplay={onReplay} />
+        ) : showRejected ? (
+          <RejectedState message={rejectionMessage} onReplay={onReplay} />
+        ) : state === "error" ? (
           <div className="flex h-full flex-col items-center justify-center px-8 text-center">
             <div className="font-mono text-[10px] uppercase tracking-[0.18em] text-rose-600">
               Audit failed

@@ -12,7 +12,9 @@ export type AuditEvent =
       ts: string;
     }
   | { type: "facts"; facts: BillFacts }
+  | { type: "rejected"; reason: "not_a_bill" | "low_confidence"; message: string }
   | { type: "findings"; findings: Finding[] }
+  | { type: "verified-clean" }
   | { type: "draft-start" }
   | { type: "draft-token"; token: string }
   | { type: "draft-end"; body: string }

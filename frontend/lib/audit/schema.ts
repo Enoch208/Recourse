@@ -8,7 +8,23 @@ export const LineItemSchema = z.object({
   units: z.number().optional(),
 });
 
+export const DocumentTypeSchema = z.enum([
+  "medical_bill",
+  "eob",
+  "collections_notice",
+  "denial_letter",
+  "other",
+]);
+
+export const ConfidenceSchema = z.enum(["high", "medium", "low"]);
+
 export const BillFactsSchema = z.object({
+  documentType: DocumentTypeSchema.describe(
+    "What kind of document this is. Use 'other' if it is not a US medical billing artifact (e.g. a recipe, resume, tax form, screenshot, foreign hospital bill)."
+  ),
+  confidence: ConfidenceSchema.describe(
+    "Your confidence that the extracted facts are accurate. 'high' = all fields clearly readable; 'medium' = some inference required; 'low' = poor scan or ambiguous."
+  ),
   provider: z.object({
     name: z.string().describe("Billing entity name as printed"),
     facility: z.string().optional().describe("Facility / hospital name if different"),
@@ -74,6 +90,8 @@ export const BillFactsSchema = z.object({
 
 export type LineItem = z.infer<typeof LineItemSchema>;
 export type BillFacts = z.infer<typeof BillFactsSchema>;
+export type DocumentType = z.infer<typeof DocumentTypeSchema>;
+export type Confidence = z.infer<typeof ConfidenceSchema>;
 
 export type Category = "NSA" | "FDCPA" | "ERISA" | "HIPAA" | "Reg E";
 

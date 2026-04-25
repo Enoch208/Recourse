@@ -19,6 +19,7 @@ import {
 } from "@/components/workspace/AuditStream";
 import type { AuditEvent } from "@/lib/audit/events";
 import type { BillFacts, Finding } from "@/lib/audit/schema";
+import { downloadLetterPdf, printLetterPdf } from "@/lib/audit/pdf";
 
 type Phase = "upload" | "running" | "done" | "error";
 
@@ -36,6 +37,7 @@ export default function AuditWorkstation() {
   const [draftBody, setDraftBody] = useState("");
   const [streamState, setStreamState] = useState<StreamState>("idle");
   const [error, setError] = useState<string | null>(null);
+  const [rejectionMessage, setRejectionMessage] = useState<string | null>(null);
   const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const abortRef = useRef<AbortController | null>(null);
@@ -51,6 +53,7 @@ export default function AuditWorkstation() {
     setDraftBody("");
     setStreamState("idle");
     setError(null);
+    setRejectionMessage(null);
   }, []);
 
   const handleEvent = useCallback((event: AuditEvent) => {
@@ -69,6 +72,15 @@ export default function AuditWorkstation() {
         break;
       case "facts":
         setFacts(event.facts);
+        break;
+      case "rejected":
+        setRejectionMessage(event.message);
+        setStreamState("rejected");
+        setPhase("done");
+        break;
+      case "verified-clean":
+        setStreamState("verified-clean");
+        setPhase("done");
         break;
       case "findings":
         setFindings(event.findings);
@@ -89,7 +101,13 @@ export default function AuditWorkstation() {
         setPhase("error");
         break;
       case "done":
-        setStreamState((prev) => (prev === "error" ? prev : "done"));
+        setStreamState((prev) =>
+          prev === "error" ||
+          prev === "rejected" ||
+          prev === "verified-clean"
+            ? prev
+            : "done"
+        );
         setPhase((prev) => (prev === "error" ? prev : "done"));
         break;
     }
@@ -106,6 +124,7 @@ export default function AuditWorkstation() {
       setFindings([]);
       setDraftBody("");
       setError(null);
+      setRejectionMessage(null);
       setAuditId(generateAuditId());
 
       try {
@@ -121,15 +140,12 @@ export default function AuditWorkstation() {
           headers = { "content-type": "application/json" };
         }
 
-        console.log("[audit] POST /api/audit starting", { useFixture: !input.pdf });
         const res = await fetch("/api/audit", {
           method: "POST",
           body,
           headers,
           signal: controller.signal,
         });
-
-        console.log("[audit] response", res.status, res.headers.get("content-type"));
 
         if (!res.ok || !res.body) {
           const text = await res.text().catch(() => "");
@@ -139,18 +155,11 @@ export default function AuditWorkstation() {
         const reader = res.body.getReader();
         const decoder = new TextDecoder();
         let buf = "";
-        let chunkCount = 0;
 
         while (true) {
           const { done, value } = await reader.read();
-          if (done) {
-            console.log("[audit] stream done", { chunksReceived: chunkCount });
-            break;
-          }
-          chunkCount++;
-          const text = decoder.decode(value, { stream: true });
-          console.log("[audit] chunk", chunkCount, "bytes:", value?.byteLength);
-          buf += text;
+          if (done) break;
+          buf += decoder.decode(value, { stream: true });
           const chunks = buf.split("\n\n");
           buf = chunks.pop() ?? "";
           for (const chunk of chunks) {
@@ -160,10 +169,9 @@ export default function AuditWorkstation() {
             if (!json) continue;
             try {
               const event = JSON.parse(json) as AuditEvent;
-              console.log("[audit] event", event.type);
               handleEvent(event);
-            } catch (e) {
-              console.warn("[audit] parse error", e, "json:", json.substring(0, 200));
+            } catch {
+              // ignore malformed chunks
             }
           }
         }
@@ -199,36 +207,13 @@ export default function AuditWorkstation() {
 
   const downloadLetter = useCallback(() => {
     if (!facts || !draftBody) return;
-    const today = new Date().toISOString().substring(0, 10);
-    const citations = findings.map((f) => f.statuteCode).join(", ");
-    const text = `RECOURSE — DEMAND LETTER
-Reference: ${auditId || "—"}
-Date: ${today}
-
-To: ${facts.provider.name}
-${facts.provider.address ?? ""}
-
-Re: Account #${facts.patient.accountId ?? "—"} · DOS ${facts.dateOfService} · Amount in dispute $${facts.totalBalance.toFixed(2)}
-
-${draftBody}
-
-— ${facts.patient.name ?? "Patient"}
-Drafted via Recourse · Citations: ${citations}
-`;
-    const blob = new Blob([text], { type: "text/plain;charset=utf-8" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `recourse-letter-${auditId || "draft"}.txt`;
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    URL.revokeObjectURL(url);
+    downloadLetterPdf({ facts, findings, body: draftBody, auditId });
   }, [facts, draftBody, findings, auditId]);
 
   const printLetter = useCallback(() => {
-    window.print();
-  }, []);
+    if (!facts || !draftBody) return;
+    printLetterPdf({ facts, findings, body: draftBody, auditId });
+  }, [facts, draftBody, findings, auditId]);
 
   const showSplit = phase !== "upload";
   const isLetterReady = phase === "done" && draftBody.length > 0;
@@ -334,6 +319,7 @@ Drafted via Recourse · Citations: ${citations}
                 draftBody={draftBody}
                 state={streamState}
                 error={error}
+                rejectionMessage={rejectionMessage}
                 onReplay={reset}
                 auditId={auditId}
               />

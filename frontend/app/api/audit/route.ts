@@ -2,7 +2,10 @@ import { NextRequest } from "next/server";
 import { extractBillFacts } from "@/lib/audit/extract";
 import { matchStatutes } from "@/lib/audit/statutes";
 import { streamLetterDraft } from "@/lib/audit/draft";
-import { MEMORIAL_HEALTH_FIXTURE } from "@/lib/audit/fixtures";
+import {
+  MEMORIAL_HEALTH_FIXTURE,
+  MEMORIAL_HEALTH_LETTER,
+} from "@/lib/audit/fixtures";
 import { encodeEvent, nowTs, type AuditEvent } from "@/lib/audit/events";
 import type { BillFacts, Finding } from "@/lib/audit/schema";
 
@@ -44,16 +47,6 @@ function pause(ms: number) {
 }
 
 export async function POST(req: NextRequest) {
-  if (!process.env.ANTHROPIC_API_KEY) {
-    return Response.json(
-      {
-        error:
-          "ANTHROPIC_API_KEY is not configured. Add it to frontend/.env.local and restart the dev server.",
-      },
-      { status: 503 }
-    );
-  }
-
   let parsed: Awaited<ReturnType<typeof parseRequest>>;
   try {
     parsed = await parseRequest(req);
@@ -61,6 +54,18 @@ export async function POST(req: NextRequest) {
     return Response.json(
       { error: err instanceof Error ? err.message : "Bad request" },
       { status: 400 }
+    );
+  }
+
+  // Real PDFs need Claude for extraction. The fixture path can fall back
+  // to a cached letter, so it stays demo-safe even without a key.
+  if (!process.env.ANTHROPIC_API_KEY && !parsed.useFixture) {
+    return Response.json(
+      {
+        error:
+          "ANTHROPIC_API_KEY is not configured. Add it to frontend/.env.local and restart the dev server.",
+      },
+      { status: 503 }
     );
   }
 
@@ -96,6 +101,31 @@ export async function POST(req: NextRequest) {
         }
 
         send({ type: "facts", facts });
+
+        if (facts.documentType === "other") {
+          send({
+            type: "log",
+            phase: "extract",
+            text: "Document does not appear to be a US medical billing artifact",
+            ts: nowTs(),
+          });
+          send({
+            type: "rejected",
+            reason: "not_a_bill",
+            message:
+              "This document doesn't appear to be a medical bill, insurance EOB, or collections notice. Recourse currently audits these document types — try uploading a bill or denial letter.",
+          });
+          send({ type: "done" });
+          return;
+        }
+
+        send({
+          type: "log",
+          phase: "extract",
+          text: `Document recognized: ${facts.documentType.replace("_", " ")} · confidence ${facts.confidence}`,
+          ts: nowTs(),
+        });
+        await pause(120);
 
         send({
           type: "log",
@@ -140,6 +170,7 @@ export async function POST(req: NextRequest) {
             text: "No statute violations matched — bill appears compliant",
             ts: nowTs(),
           });
+          send({ type: "verified-clean" });
         } else {
           for (const finding of findings) {
             send({
@@ -170,10 +201,36 @@ export async function POST(req: NextRequest) {
           send({ type: "draft-start" });
 
           let body = "";
-          const result = streamLetterDraft(facts, findings);
-          for await (const delta of result.textStream) {
-            body += delta;
-            send({ type: "draft-token", token: delta });
+          let draftFailed = false;
+          try {
+            const result = streamLetterDraft(facts, findings);
+            for await (const delta of result.textStream) {
+              body += delta;
+              send({ type: "draft-token", token: delta });
+            }
+          } catch (draftErr) {
+            draftFailed = true;
+            console.error("Live draft failed, using cached letter:", draftErr);
+          }
+
+          // If the live draft failed AND we're on the bulletproof fixture path,
+          // stream the cached Memorial Health letter so the demo never errors.
+          if (draftFailed && parsed.useFixture) {
+            body = "";
+            const chunkSize = 32;
+            for (let i = 0; i < MEMORIAL_HEALTH_LETTER.length; i += chunkSize) {
+              const token = MEMORIAL_HEALTH_LETTER.slice(i, i + chunkSize);
+              body += token;
+              send({ type: "draft-token", token });
+              await pause(40);
+            }
+          } else if (draftFailed) {
+            send({
+              type: "error",
+              message:
+                "The drafting model failed. Findings are still valid — try Run another audit.",
+            });
+            return;
           }
 
           send({ type: "draft-end", body });
@@ -183,9 +240,17 @@ export async function POST(req: NextRequest) {
       } catch (err) {
         const message =
           err instanceof Error ? err.message : "Audit pipeline failed";
-        send({ type: "error", message });
+        try {
+          send({ type: "error", message });
+        } catch {
+          // controller may already be closed if the client disconnected
+        }
       } finally {
-        controller.close();
+        try {
+          controller.close();
+        } catch {
+          // already closed — safe to ignore
+        }
       }
     },
   });

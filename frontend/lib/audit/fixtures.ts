@@ -1,6 +1,18 @@
 import type { BillFacts } from "./schema";
 
+// Pre-baked demand letter for the Memorial Health fixture. Used as a guaranteed
+// fallback if the live Claude draft call fails — keeps the demo bulletproof.
+export const MEMORIAL_HEALTH_LETTER = `This letter is submitted on behalf of the patient identified under account BA-2026-1298 at Memorial Health Medical Center, concerning services rendered on March 14, 2026, for which a total balance of $8,450.00 has been assessed. The billing record presents multiple violations of federal surprise billing protections and coding standards, each addressed in turn below.
+
+Pursuant to NSA § 2799A-2, patient liability for out-of-network ancillary providers — including anesthesia, radiology, and pathology services — rendered at an in-network facility is capped at the applicable in-network cost-sharing amount. The bill reflects out-of-network charges for ancillary services at what qualifies as an in-network facility under the statute's protections, placing the full balance of $8,450.00 subject to mandatory repricing. Separately, NSA § 2799A-1 prohibits balance billing for out-of-network facility fees in emergency care settings absent a good-faith estimate and written patient consent. The facility fee of $1,850.00 appearing on this bill was assessed without either prerequisite, and the statute requires that this charge be voided or repriced to the in-network rate.
+
+Additionally, one line item — procedure code 80053, a comprehensive metabolic panel, charged at $320.00 — bears CPT modifier 59 in a context that appears inconsistent with National Correct Coding Initiative edits governing routinely paired services. Under applicable coding standards, this charge is subject to rebundling review, with an estimated $160.00 in excess charges warranting correction by the payer or provider.
+
+Memorial Health Medical Center is requested to provide a written response addressing each of the foregoing items within thirty (30) days of receipt of this letter.`;
+
 export const MEMORIAL_HEALTH_FIXTURE: BillFacts = {
+  documentType: "medical_bill",
+  confidence: "high",
   provider: {
     name: "Memorial Health Medical Center",
     facility: "Memorial Health Medical Center",

@@ -89,7 +89,8 @@ export function EvidenceBill({ facts }: Props) {
         </thead>
         <tbody>
           {facts.lineItems.map((li, i) => {
-            const flagged = /facility/i.test(li.description);
+            const flagged =
+              /facility/i.test(li.description) || li.modifier === "59";
             return (
               <tr
                 key={i}
@@ -109,7 +110,7 @@ export function EvidenceBill({ facts }: Props) {
                 >
                   {li.description}
                   {li.modifier && (
-                    <span className="ml-1.5 rounded-sm bg-amber-50 px-1 text-[8.5px] font-semibold tracking-tight text-amber-700">
+                    <span className="ml-1.5 rounded-sm bg-rose-50 px-1 text-[8.5px] font-semibold tracking-tight text-rose-700">
                       MOD {li.modifier}
                     </span>
                   )}
