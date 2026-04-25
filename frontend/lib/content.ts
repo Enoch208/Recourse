@@ -18,10 +18,19 @@ import {
 import type { IconSvgElement } from "@hugeicons/react";
 
 type Link = { label: string; href: string };
+type ChipTone = "emerald" | "rose" | "amber" | "sky" | "violet" | "indigo";
 type Chip = {
   code: string;
   label: string;
   status: string;
+  tone: ChipTone;
+};
+type CaseBox = {
+  ref: string;
+  title: string;
+  summary: string;
+  primary: { label: string };
+  secondary: { label: string };
 };
 
 export const brand = {
@@ -74,12 +83,12 @@ export const useCases = {
       description:
         "Out-of-network facility fees and balance-billing violations under the No Surprises Act.",
       icon: BalanceScaleIcon,
-      tone: "rose" as const,
+      tone: "emerald" as const,
       chips: [
-        { code: "NSA § 2799A-1", label: "Facility fee  $8,450", status: "Flag" },
-        { code: "NSA § 2799B-2", label: "Emergency visit", status: "Balance" },
-        { code: "ERISA 2719", label: "Appeal window open", status: "Notice" },
-        { code: "HIPAA § 164.524", label: "Itemized request", status: "Pending" },
+        { code: "NSA § 2799A-1", label: "Facility fee  $8,450", status: "Flag", tone: "rose" },
+        { code: "NSA § 2799B-2", label: "Emergency visit", status: "Balance", tone: "amber" },
+        { code: "ERISA 2719", label: "Appeal window open", status: "Notice", tone: "sky" },
+        { code: "HIPAA § 164.524", label: "Itemized request", status: "Pending", tone: "emerald" },
       ] satisfies Chip[],
     },
     {
@@ -87,12 +96,12 @@ export const useCases = {
       description:
         "Flags duplicate charges, upcoded CPT codes, and services billed after discharge.",
       icon: Analytics01Icon,
-      tone: "amber" as const,
+      tone: "sky" as const,
       chips: [
-        { code: "CPT 99213", label: "Duplicate  × 2", status: "Flag" },
-        { code: "CPT 45378", label: "Upcode suspect", status: "Flag" },
-        { code: "MOD 59", label: "Unbundling", status: "Review" },
-        { code: "CMS-1500", label: "Post-discharge", status: "Flag" },
+        { code: "CPT 99213", label: "Duplicate  × 2", status: "Flag", tone: "rose" },
+        { code: "CPT 45378", label: "Upcode suspect", status: "High", tone: "amber" },
+        { code: "MOD 59", label: "Unbundling", status: "Review", tone: "sky" },
+        { code: "CMS-1500", label: "Post-discharge", status: "Notice", tone: "violet" },
       ] satisfies Chip[],
     },
     {
@@ -100,13 +109,15 @@ export const useCases = {
       description:
         "Drafts FDCPA validation letters before a medical debt reaches your credit file.",
       icon: Legal01Icon,
-      tone: "indigo" as const,
-      chips: [
-        { code: "FDCPA § 1692g", label: "Validation ready", status: "Ready" },
-        { code: "FCRA § 1681s-2", label: "Credit hold", status: "Notice" },
-        { code: "TCPA § 227", label: "Call log audit", status: "Armed" },
-        { code: "CFPB § 1006", label: "Cease-communication", status: "Draft" },
-      ] satisfies Chip[],
+      tone: "violet" as const,
+      caseBox: {
+        ref: "FDCPA · 1692g",
+        title: "Validation triage",
+        summary:
+          "Collector failed to issue § 1692g validation notice within five days of initial contact. Letter draft ready.",
+        primary: { label: "Send validation" },
+        secondary: { label: "Dismiss" },
+      } satisfies CaseBox,
     },
     {
       title: "Insurance denials",
@@ -115,10 +126,10 @@ export const useCases = {
       icon: FileVerifiedIcon,
       tone: "emerald" as const,
       chips: [
-        { code: "ERISA § 503-1", label: "Internal appeal", status: "Drafted" },
-        { code: "ACA § 2719", label: "External review", status: "Queued" },
-        { code: "HIPAA § 164.510", label: "Records request", status: "Match" },
-        { code: "ACA § 1557", label: "Non-discrimination", status: "Match" },
+        { code: "ERISA § 503-1", label: "Internal appeal", status: "Drafted", tone: "emerald" },
+        { code: "ACA § 2719", label: "External review", status: "Queued", tone: "sky" },
+        { code: "HIPAA § 164.510", label: "Records request", status: "Notice", tone: "amber" },
+        { code: "ACA § 1557", label: "Non-discrimination", status: "Match", tone: "emerald" },
       ] satisfies Chip[],
     },
   ],
