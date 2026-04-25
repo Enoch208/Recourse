@@ -36,7 +36,7 @@ export function Hero() {
         aria-hidden
         className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_60%_55%_at_50%_50%,rgba(255,255,255,0.72),rgba(255,255,255,0.25)_55%,transparent_80%)]"
       />
-      <Container className="relative grid min-w-0 items-center gap-12 py-24 lg:grid-cols-2 lg:gap-16 lg:py-32">
+      <Container className="relative grid min-w-0 items-center gap-12 py-24 lg:grid-cols-[1fr_1.25fr] lg:gap-14 lg:py-32">
         <motion.div
           className="flex min-w-0 flex-col"
           initial="hidden"
@@ -115,7 +115,7 @@ export function Hero() {
           animate={{ opacity: 1, y: 0, scale: 1 }}
           transition={{ duration: 1, delay: 0.25, ease: EASE }}
         >
-          <div className="relative w-full max-w-[690px] overflow-hidden rounded-2xl border border-border-strong bg-white shadow-[0_18px_48px_rgb(15_23_42/0.08),0_2px_6px_rgb(15_23_42/0.04)]">
+          <div className="relative w-full max-w-[820px] overflow-hidden rounded-2xl border border-border-strong bg-white shadow-[0_18px_48px_rgb(15_23_42/0.08),0_2px_6px_rgb(15_23_42/0.04)]">
             <Image
               src="/better_hero.png"
               alt="Recourse workspace — My Summary dashboard with active disputes and recovery progress"
