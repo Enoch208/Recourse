@@ -136,38 +136,46 @@ export const useCases = {
 };
 
 export const automation = {
-  eyebrow: "The engine",
-  title: "Four steps.\nFully auditable.",
+  eyebrow: "Protocol",
+  title: "The audit protocol.",
   description:
-    "Recourse shows its work before it drafts. Every letter ships with a reviewable audit trail.",
+    "Four deterministic stages. Every extracted fact traced to a statute. Every draft backed by a citation.",
   steps: [
     {
       step: "01",
-      title: "Scan the document",
+      label: "SYS_READY",
+      title: "Ingest & extract",
       description:
-        "Upload a bill. Recourse extracts dates, providers, CPT codes, and line items.",
+        "OCR maps unstructured bills into a standardized JSON schema — dates, providers, CPT codes, and amounts.",
       icon: Invoice01Icon,
+      hint: `{ "dos": "03/14/26", "cpt": "99213" }`,
     },
     {
       step: "02",
-      title: "Match against statute",
+      label: "VERIFIED",
+      title: "Statute matching",
       description:
-        "Each fact compared against a hardcoded statute library. Deterministic, not guessed.",
+        "Cross-references every line item against the verified federal statute library — deterministic, not inferred.",
       icon: Database02Icon,
+      hint: "MATCH · 45 CFR § 149.610",
     },
     {
       step: "03",
-      title: "Verify the trail",
+      label: "STREAMING",
+      title: "Audit trail",
       description:
-        "The audit streams to your screen. Review every rule, fact, and citation before the letter ships.",
+        "Every rule, fact, and citation streams to the workspace for review before the letter is drafted.",
       icon: Stamp02Icon,
+      hint: "→ § 1692g.validation.ready",
     },
     {
       step: "04",
-      title: "Draft the letter",
+      label: "READY",
+      title: "Recourse generation",
       description:
-        "A signed, ready-to-send demand letter. Every claim backed by the exact statute.",
+        "Compiles a statute-backed demand letter with named remedies and specific dollar amounts — signed, ready to send.",
       icon: SignatureIcon,
+      hint: "DEMAND · 2 pages · signed",
     },
   ],
 };

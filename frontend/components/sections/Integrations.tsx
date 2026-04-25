@@ -40,7 +40,7 @@ export function Integrations() {
   return (
     <section
       id="solution"
-      className="border-b border-border bg-[linear-gradient(180deg,#ffffff,#f7fbff)]"
+      className="border-t border-border bg-surface"
     >
       <Container className="py-24 lg:py-32">
         <motion.div
@@ -83,14 +83,14 @@ export function Integrations() {
             <motion.div
               key={item.label}
               variants={tileIn}
-              className="group flex h-12 items-center justify-between rounded-[7px] border border-white/75 bg-white/78 px-3 shadow-[0_14px_34px_rgb(14_116_144/0.08)] backdrop-blur transition-colors duration-200 hover:border-border-strong hover:bg-white"
+              className="group flex h-12 items-center justify-between rounded-[7px] border border-neutral-200 bg-white px-3 transition-colors duration-200 hover:border-neutral-400"
             >
               <div className="flex min-w-0 items-center gap-2.5">
                 <HugeiconsIcon
                   icon={item.icon}
                   size={15}
-                  strokeWidth={1.75}
-                  className="shrink-0 text-[#1593b8]"
+                  strokeWidth={1.5}
+                  className="shrink-0 text-ink"
                 />
                 <span className="truncate text-[13px] text-ink">
                   {item.label}
@@ -99,8 +99,8 @@ export function Integrations() {
               <HugeiconsIcon
                 icon={PlusSignIcon}
                 size={12}
-                strokeWidth={1.75}
-                className="shrink-0 text-faint transition-colors duration-200 group-hover:text-muted"
+                strokeWidth={1.5}
+                className="shrink-0 text-neutral-300 transition-colors duration-200 group-hover:text-neutral-500"
               />
             </motion.div>
           ))}

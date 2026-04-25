@@ -42,10 +42,10 @@ function FloatingIcon({ icon, className }: FloatProps) {
   return (
     <motion.span
       variants={float}
-      className={`absolute hidden h-10 w-10 items-center justify-center rounded-[7px] border border-white/80 bg-white/82 text-[#1593b8] shadow-[0_18px_40px_rgb(14_116_144/0.1)] backdrop-blur md:inline-flex ${className}`}
+      className={`absolute hidden h-10 w-10 items-center justify-center rounded-[6px] border border-neutral-200 bg-white text-neutral-700 shadow-[0_1px_2px_rgb(15_23_42/0.04)] md:inline-flex ${className}`}
       aria-hidden
     >
-      <HugeiconsIcon icon={icon} size={18} strokeWidth={1.75} />
+      <HugeiconsIcon icon={icon} size={16} strokeWidth={1.5} />
     </motion.span>
   );
 }
@@ -61,10 +61,7 @@ const positions = [
 
 export function ExploreCTA() {
   return (
-    <section
-      id="demo"
-      className="border-b border-border bg-[linear-gradient(135deg,#f5fff9,#f2f9ff_48%,#fff6fb)]"
-    >
+    <section id="demo" className="border-t border-border bg-surface">
       <Container className="py-24 lg:py-32">
         <motion.div
           initial="hidden"
@@ -79,19 +76,19 @@ export function ExploreCTA() {
 
           <motion.div
             variants={rise}
-            className="font-mono text-[11px] uppercase tracking-[0.18em] text-muted"
+            className="font-mono text-[10px] uppercase tracking-[0.22em] text-neutral-400"
           >
             {explore.eyebrow}
           </motion.div>
           <motion.h2
             variants={rise}
-            className="font-display mt-4 text-[44px] leading-[1.02] text-ink sm:text-[56px]"
+            className="font-display mt-4 text-[40px] leading-[1.02] tracking-tight text-ink sm:text-[52px]"
           >
             {explore.title}
           </motion.h2>
           <motion.p
             variants={rise}
-            className="mx-auto mt-5 max-w-[480px] text-[14px] leading-[1.65] text-muted"
+            className="mx-auto mt-5 max-w-[460px] text-[14px] leading-[1.65] text-muted"
           >
             {explore.description}
           </motion.p>
@@ -102,7 +99,7 @@ export function ExploreCTA() {
               <HugeiconsIcon
                 icon={ArrowRight01Icon}
                 size={16}
-                strokeWidth={1.75}
+                strokeWidth={1.5}
               />
             </Button>
           </motion.div>
