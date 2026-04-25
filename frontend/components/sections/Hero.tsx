@@ -1,11 +1,11 @@
 "use client";
 
-import Image from "next/image";
 import { motion } from "motion/react";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { ArrowRight01Icon } from "@hugeicons/core-free-icons";
 import { Container } from "@/components/primitives/Container";
 import { Button } from "@/components/primitives/Button";
+import { LiveAuditWorkspace } from "./LiveAuditWorkspace";
 import { hero } from "@/lib/content";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
@@ -68,6 +68,13 @@ export function Hero() {
 
           <motion.p
             variants={riseIn}
+            className="font-[Georgia] mt-4 text-[13px] italic text-neutral-500"
+          >
+            Not legal advice — a path to recourse.
+          </motion.p>
+
+          <motion.p
+            variants={riseIn}
             className="mt-6 max-w-[460px] text-[14px] leading-[1.65] text-muted"
           >
             {hero.description}
@@ -75,7 +82,26 @@ export function Hero() {
 
           <motion.div
             variants={riseIn}
-            className="mt-10 flex flex-wrap items-center gap-3"
+            className="mt-7 flex flex-wrap items-center gap-x-6 gap-y-2 text-[13px] text-muted"
+          >
+            <span className="inline-flex items-baseline gap-1.5">
+              <span className="font-mono text-[17px] font-semibold tracking-tight text-ink">
+                $2,847
+              </span>
+              <span>median refund secured</span>
+            </span>
+            <span className="hidden text-neutral-300 sm:inline">·</span>
+            <span className="inline-flex items-baseline gap-1.5">
+              <span className="font-mono text-[17px] font-semibold tracking-tight text-ink">
+                73%
+              </span>
+              <span>hospital response rate</span>
+            </span>
+          </motion.div>
+
+          <motion.div
+            variants={riseIn}
+            className="mt-8 flex flex-wrap items-center gap-3"
           >
             <Button href={hero.primary.href}>
               {hero.primary.label}
@@ -97,21 +123,7 @@ export function Hero() {
           animate={{ opacity: 1, y: 0, scale: 1 }}
           transition={{ duration: 1, delay: 0.25, ease: EASE }}
         >
-          <div className="relative w-full max-w-[620px]">
-            <div
-              aria-hidden
-              className="pointer-events-none absolute -inset-6 rounded-[22px] bg-[radial-gradient(60%_60%_at_50%_50%,rgba(15,23,42,0.12),transparent_70%)] blur-2xl"
-            />
-            <Image
-              src="/hero_img.png"
-              alt="Recourse audit workspace"
-              width={1586}
-              height={992}
-              priority
-              sizes="(max-width: 1024px) 100vw, 620px"
-              className="relative h-auto w-full rounded-[14px] shadow-[0_30px_80px_rgb(15_23_42/0.14),0_8px_20px_rgb(15_23_42/0.05)] ring-1 ring-black/[0.06]"
-            />
-          </div>
+          <LiveAuditWorkspace />
         </motion.div>
       </Container>
     </section>

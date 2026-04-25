@@ -3,16 +3,10 @@ import {
   ArrowRight04Icon,
   BalanceScaleIcon,
   Database02Icon,
-  FileLinkIcon,
   FileVerifiedIcon,
-  Hospital02Icon,
   Invoice01Icon,
   Legal01Icon,
-  Legal02Icon,
-  Mail01Icon,
-  ReceiptDollarIcon,
   SignatureIcon,
-  SparklesIcon,
   Stamp02Icon,
 } from "@hugeicons/core-free-icons";
 import type { IconSvgElement } from "@hugeicons/react";
@@ -55,21 +49,6 @@ export const hero = {
     "Upload a medical bill. Recourse cites the statute, drafts the demand letter, and hands you a signed PDF.",
   primary: { label: "Request demo", href: "#demo" },
   secondary: { label: "See the audit trail", href: "#solution" },
-};
-
-export const integrations = {
-  eyebrow: "Document intake",
-  title: "Every bill,\ntreated as evidence.",
-  description:
-    "Recourse ingests bills, EOBs, and collections notices — then extracts facts for the audit engine.",
-  items: [
-    { label: "Hospital bills", icon: Invoice01Icon },
-    { label: "Insurance EOBs", icon: FileVerifiedIcon },
-    { label: "Pharmacy receipts", icon: ReceiptDollarIcon },
-    { label: "Collections", icon: Legal02Icon },
-    { label: "Portal PDFs", icon: FileLinkIcon },
-    { label: "Itemized bills", icon: Hospital02Icon },
-  ] satisfies { label: string; icon: IconSvgElement }[],
 };
 
 export const useCases = {
@@ -148,7 +127,7 @@ export const automation = {
       description:
         "OCR maps unstructured bills into a standardized JSON schema — dates, providers, CPT codes, and amounts.",
       icon: Invoice01Icon,
-      hint: `{ "dos": "03/14/26", "cpt": "99213" }`,
+      hint: `{ "dos": "03/14/2026", "cpt": "99213" }`,
     },
     {
       step: "02",
@@ -171,29 +150,13 @@ export const automation = {
     {
       step: "04",
       label: "READY",
-      title: "Recourse generation",
+      title: "Letter generation",
       description:
         "Compiles a statute-backed demand letter with named remedies and specific dollar amounts — signed, ready to send.",
       icon: SignatureIcon,
       hint: "DEMAND · 2 pages · signed",
     },
   ],
-};
-
-export const explore = {
-  eyebrow: "Start here",
-  title: "Explore Recourse.",
-  description:
-    "For everyone who has ever opened a medical bill and assumed there was nothing they could do.",
-  cta: { label: "Request demo", href: "#demo" },
-  floatingIcons: [
-    SparklesIcon,
-    SignatureIcon,
-    BalanceScaleIcon,
-    Mail01Icon,
-    FileVerifiedIcon,
-    Stamp02Icon,
-  ] satisfies IconSvgElement[],
 };
 
 export const footer = {
