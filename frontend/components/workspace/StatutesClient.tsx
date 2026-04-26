@@ -1,5 +1,6 @@
 "use client";
 
+import { useMemo, useState } from "react";
 import { motion } from "motion/react";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Search01Icon, SecurityCheckIcon } from "@hugeicons/core-free-icons";
@@ -19,6 +20,7 @@ export type StatuteEntry = {
 };
 
 const categories = ["All", "NSA", "FDCPA", "ERISA", "HIPAA", "Reg E"] as const;
+type StatuteFilter = (typeof categories)[number];
 
 const categoryTone: Record<StatuteCategory, string> = {
   NSA: "text-emerald-700 bg-emerald-50",
@@ -35,6 +37,32 @@ export function StatutesClient({
   statutes: StatuteEntry[];
   showHits: boolean;
 }) {
+  const [activeCategory, setActiveCategory] = useState<StatuteFilter>("All");
+  const [query, setQuery] = useState("");
+
+  const filteredStatutes = useMemo(() => {
+    const normalizedQuery = query.trim().toLowerCase();
+
+    return statutes.filter((statute) => {
+      const matchesCategory =
+        activeCategory === "All" || statute.category === activeCategory;
+      const matchesQuery =
+        normalizedQuery.length === 0 ||
+        [
+          statute.code,
+          statute.title,
+          statute.category,
+          statute.trigger,
+          statute.remedy,
+        ]
+          .join(" ")
+          .toLowerCase()
+          .includes(normalizedQuery);
+
+      return matchesCategory && matchesQuery;
+    });
+  }, [activeCategory, query, statutes]);
+
   return (
     <>
       <PageHeader
@@ -60,19 +88,25 @@ export function StatutesClient({
       >
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
           <div className="flex flex-wrap items-center gap-1.5">
-            {categories.map((label, i) => (
-              <button
-                key={label}
-                type="button"
-                className={`h-8 rounded-[8px] px-3 text-[12px] tracking-tight transition-colors ${
-                  i === 0
-                    ? "bg-ink text-white"
-                    : "text-neutral-500 hover:bg-neutral-100 hover:text-ink"
-                }`}
-              >
-                {label}
-              </button>
-            ))}
+            {categories.map((label) => {
+              const isActive = activeCategory === label;
+
+              return (
+                <button
+                  key={label}
+                  type="button"
+                  aria-pressed={isActive}
+                  onClick={() => setActiveCategory(label)}
+                  className={`h-8 rounded-[8px] px-3 text-[12px] tracking-tight transition-colors ${
+                    isActive
+                      ? "bg-ink text-white"
+                      : "text-neutral-500 hover:bg-neutral-100 hover:text-ink"
+                  }`}
+                >
+                  {label}
+                </button>
+              );
+            })}
           </div>
           <div className="relative w-full sm:w-auto">
             <HugeiconsIcon
@@ -83,6 +117,9 @@ export function StatutesClient({
             />
             <input
               type="search"
+              aria-label="Search statutes"
+              value={query}
+              onChange={(event) => setQuery(event.target.value)}
               placeholder="Search citations or triggers"
               className="h-9 w-full rounded-[10px] border border-neutral-200 bg-white pl-8 pr-3 text-[12.5px] tracking-tight text-ink placeholder:text-neutral-400 focus:border-neutral-400 focus:outline-none sm:w-[280px]"
             />
@@ -90,7 +127,7 @@ export function StatutesClient({
         </div>
 
         <div className="mt-5 grid gap-4 lg:grid-cols-2">
-          {statutes.map((statute) => (
+          {filteredStatutes.map((statute) => (
             <article
               key={statute.code}
               className="rounded-[16px] border border-neutral-200/70 bg-white p-5 transition-colors hover:border-neutral-300"
@@ -141,6 +178,16 @@ export function StatutesClient({
             </article>
           ))}
         </div>
+        {filteredStatutes.length === 0 ? (
+          <div className="mt-5 rounded-[12px] border border-dashed border-neutral-200 bg-white px-4 py-8 text-center">
+            <p className="text-[13px] font-medium tracking-tight text-ink">
+              No statutes found
+            </p>
+            <p className="mt-1 text-[12px] tracking-tight text-neutral-500">
+              Try another category or search term.
+            </p>
+          </div>
+        ) : null}
       </motion.div>
     </>
   );
