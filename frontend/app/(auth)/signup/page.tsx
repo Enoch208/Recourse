@@ -174,13 +174,30 @@ export default function SignupPage() {
             )}
           </label>
 
-          <label className="flex items-start gap-2.5 pt-1">
+          <label className="flex cursor-pointer items-start gap-2.5 pt-1">
             <input
               type="checkbox"
               checked={agreed}
               onChange={(e) => setAgreed(e.target.checked)}
-              className="peer mt-0.5 h-4 w-4 cursor-pointer appearance-none rounded-[4px] border border-neutral-300 bg-white checked:border-ink checked:bg-ink focus:outline-none focus:ring-2 focus:ring-ink/10"
+              className="peer sr-only"
             />
+            <span
+              aria-hidden
+              className={`mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-[5px] border transition-colors peer-focus-visible:ring-2 peer-focus-visible:ring-ink/10 ${
+                agreed
+                  ? "border-ink bg-ink"
+                  : "border-neutral-300 bg-white hover:border-neutral-400"
+              }`}
+            >
+              <HugeiconsIcon
+                icon={Tick02Icon}
+                size={10}
+                strokeWidth={3}
+                className={`text-white transition-opacity ${
+                  agreed ? "opacity-100" : "opacity-0"
+                }`}
+              />
+            </span>
             <span className="text-[12px] leading-relaxed text-neutral-600">
               I agree to Recourse&apos;s{" "}
               <Link

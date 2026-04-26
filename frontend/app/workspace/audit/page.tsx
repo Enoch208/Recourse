@@ -7,7 +7,6 @@ import { HugeiconsIcon } from "@hugeicons/react";
 import {
   ArrowLeft01Icon,
   Download01Icon,
-  PrinterIcon,
   UploadIcon,
   Tick02Icon,
 } from "@hugeicons/core-free-icons";
@@ -19,7 +18,7 @@ import {
 } from "@/components/workspace/AuditStream";
 import type { AuditEvent } from "@/lib/audit/events";
 import type { BillFacts, Finding } from "@/lib/audit/schema";
-import { downloadLetterPdf, printLetterPdf } from "@/lib/audit/pdf";
+import { downloadLetterPdf } from "@/lib/audit/pdf";
 import { useIdentity } from "@/components/workspace/UserContext";
 
 type Phase = "upload" | "running" | "done" | "error";
@@ -127,7 +126,9 @@ export default function AuditWorkstation() {
       setDraftBody("");
       setError(null);
       setRejectionMessage(null);
-      setAuditId(generateAuditId());
+
+      const newAuditId = generateAuditId();
+      setAuditId(newAuditId);
 
       try {
         let body: BodyInit;
@@ -135,10 +136,11 @@ export default function AuditWorkstation() {
         if (input.pdf) {
           const form = new FormData();
           form.append("pdf", input.pdf);
+          form.append("auditId", newAuditId);
           body = form;
           headers = {};
         } else {
-          body = JSON.stringify({ useFixture: true });
+          body = JSON.stringify({ useFixture: true, auditId: newAuditId });
           headers = { "content-type": "application/json" };
         }
 
@@ -212,11 +214,6 @@ export default function AuditWorkstation() {
     downloadLetterPdf({ facts, findings, body: draftBody, auditId });
   }, [facts, draftBody, findings, auditId]);
 
-  const printLetter = useCallback(() => {
-    if (!facts || !draftBody) return;
-    printLetterPdf({ facts, findings, body: draftBody, auditId });
-  }, [facts, draftBody, findings, auditId]);
-
   const showSplit = phase !== "upload";
   const isLetterReady = phase === "done" && draftBody.length > 0;
 
@@ -253,15 +250,6 @@ export default function AuditWorkstation() {
           <div className="flex flex-wrap items-center gap-2">
             {showSplit && (
               <>
-                <button
-                  type="button"
-                  onClick={printLetter}
-                  className="inline-flex h-9 w-9 items-center justify-center rounded-[10px] border border-neutral-200 bg-white text-neutral-500 transition-colors hover:border-neutral-400 hover:text-ink disabled:cursor-not-allowed disabled:border-neutral-100 disabled:bg-neutral-50 disabled:text-neutral-300"
-                  aria-label="Print letter"
-                  disabled={!isLetterReady}
-                >
-                  <HugeiconsIcon icon={PrinterIcon} size={14} strokeWidth={1.5} />
-                </button>
                 <button
                   type="button"
                   onClick={downloadLetter}

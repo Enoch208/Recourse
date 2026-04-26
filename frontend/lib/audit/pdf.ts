@@ -186,11 +186,3 @@ export function downloadLetterPdf(input: LetterInput): void {
   const doc = buildLetterPdf(input);
   doc.save(`recourse-letter-${input.auditId || "draft"}.pdf`);
 }
-
-export function printLetterPdf(input: LetterInput): void {
-  const doc = buildLetterPdf(input);
-  doc.autoPrint();
-  // Open the PDF in a new window/tab and trigger the browser print dialog.
-  const url = doc.output("bloburl");
-  window.open(url.toString(), "_blank");
-}
