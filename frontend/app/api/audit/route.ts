@@ -69,11 +69,19 @@ export async function POST(req: NextRequest) {
     );
   }
 
+  let cancelled = false;
   const stream = new ReadableStream<Uint8Array>({
     async start(controller) {
       const enc = new TextEncoder();
-      const send = (event: AuditEvent) =>
-        controller.enqueue(enc.encode(encodeEvent(event)));
+      const send = (event: AuditEvent) => {
+        if (cancelled) return;
+        try {
+          controller.enqueue(enc.encode(encodeEvent(event)));
+        } catch {
+          // controller was closed (client disconnected) — stop sending
+          cancelled = true;
+        }
+      };
 
       try {
         send({
@@ -205,10 +213,15 @@ export async function POST(req: NextRequest) {
           try {
             const result = streamLetterDraft(facts, findings);
             for await (const delta of result.textStream) {
+              if (cancelled) break;
               body += delta;
               send({ type: "draft-token", token: delta });
             }
           } catch (draftErr) {
+            // If the abort came from the client, don't pretend the model failed.
+            if (cancelled) {
+              return;
+            }
             draftFailed = true;
             console.error("Live draft failed, using cached letter:", draftErr);
           }
@@ -219,6 +232,7 @@ export async function POST(req: NextRequest) {
             body = "";
             const chunkSize = 32;
             for (let i = 0; i < MEMORIAL_HEALTH_LETTER.length; i += chunkSize) {
+              if (cancelled) break;
               const token = MEMORIAL_HEALTH_LETTER.slice(i, i + chunkSize);
               body += token;
               send({ type: "draft-token", token });
@@ -252,6 +266,9 @@ export async function POST(req: NextRequest) {
           // already closed — safe to ignore
         }
       }
+    },
+    cancel() {
+      cancelled = true;
     },
   });
 

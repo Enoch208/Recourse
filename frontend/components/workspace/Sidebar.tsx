@@ -15,8 +15,11 @@ import {
   UploadIcon,
   ArrowLeft01Icon,
   Cancel01Icon,
+  Logout01Icon,
 } from "@hugeicons/core-free-icons";
 import type { IconSvgElement } from "@hugeicons/react";
+import { useIdentity } from "./UserContext";
+import { signOutAction } from "@/app/(auth)/actions";
 
 type NavItem = {
   label: string;
@@ -47,6 +50,7 @@ type SidebarProps = {
 export function Sidebar({ mobileOpen = false, onMobileClose }: SidebarProps) {
   const [collapsed, setCollapsed] = useState(false);
   const pathname = usePathname();
+  const identity = useIdentity();
 
   // Auto-close mobile drawer on route change
   useEffect(() => {
@@ -170,6 +174,52 @@ export function Sidebar({ mobileOpen = false, onMobileClose }: SidebarProps) {
             <div className="mt-1.5 font-mono text-[11px] text-ink">
               v1.4 <span className="text-emerald-600">· Verified</span>
             </div>
+          </div>
+        )}
+
+        {!collapsed && identity.isGuest && (
+          <Link
+            href="/signup"
+            className="rounded-[12px] border border-amber-200 bg-amber-50/60 px-3 py-2.5 transition-colors hover:bg-amber-50"
+          >
+            <div className="font-mono text-[9px] uppercase tracking-[0.18em] text-amber-700">
+              Guest mode
+            </div>
+            <div className="mt-1 text-[12px] tracking-tight text-ink">
+              Create an account to save audits
+            </div>
+          </Link>
+        )}
+
+        {!collapsed && !identity.isGuest && (
+          <div className="flex items-center justify-between gap-2 rounded-[12px] border border-neutral-100 bg-neutral-50/60 px-2 py-1.5">
+            <div className="flex min-w-0 items-center gap-2">
+              <span className="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[linear-gradient(135deg,#fcd34d,#fb923c)] text-[10px] font-semibold tracking-tight text-white">
+                {identity.initials}
+              </span>
+              <div className="min-w-0 leading-tight">
+                <div className="truncate text-[11.5px] font-semibold tracking-tight text-ink">
+                  {identity.displayName}
+                </div>
+                <div className="truncate font-mono text-[9px] uppercase tracking-[0.16em] text-neutral-400">
+                  {identity.email}
+                </div>
+              </div>
+            </div>
+            <form action={signOutAction}>
+              <button
+                type="submit"
+                aria-label="Sign out"
+                title="Sign out"
+                className="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-[8px] text-neutral-400 transition-colors hover:bg-neutral-100 hover:text-ink"
+              >
+                <HugeiconsIcon
+                  icon={Logout01Icon}
+                  size={13}
+                  strokeWidth={1.5}
+                />
+              </button>
+            </form>
           </div>
         )}
 

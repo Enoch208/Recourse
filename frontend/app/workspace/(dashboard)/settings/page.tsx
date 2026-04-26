@@ -1,5 +1,6 @@
 "use client";
 
+import { useActionState } from "react";
 import { motion } from "motion/react";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
@@ -8,9 +9,19 @@ import {
   Notification01Icon,
   CreditCardIcon,
   Logout01Icon,
+  LockIcon,
+  Tick02Icon,
+  Alert02Icon,
 } from "@hugeicons/core-free-icons";
 import type { IconSvgElement } from "@hugeicons/react";
 import { PageHeader } from "@/components/workspace/PageHeader";
+import { useIdentity } from "@/components/workspace/UserContext";
+import { signOutAction } from "@/app/(auth)/actions";
+import {
+  changePasswordAction,
+  updateProfileAction,
+  type SettingsState,
+} from "./actions";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 
@@ -44,20 +55,34 @@ function Section({ icon, title, description, children }: SectionProps) {
 
 type FieldProps = {
   label: string;
-  value: string;
-  type?: "text" | "email";
+  name: string;
+  defaultValue?: string;
+  type?: "text" | "email" | "password" | "tel";
   mono?: boolean;
+  placeholder?: string;
+  required?: boolean;
 };
 
-function Field({ label, value, type = "text", mono }: FieldProps) {
+function Field({
+  label,
+  name,
+  defaultValue,
+  type = "text",
+  mono,
+  placeholder,
+  required,
+}: FieldProps) {
   return (
     <label className="block">
       <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-neutral-400">
         {label}
       </span>
       <input
+        name={name}
         type={type}
-        defaultValue={value}
+        defaultValue={defaultValue}
+        placeholder={placeholder}
+        required={required}
         className={`mt-1.5 block h-10 w-full rounded-[10px] border border-neutral-200 bg-white px-3 text-[13px] tracking-tight text-ink focus:border-neutral-400 focus:outline-none ${
           mono ? "font-mono text-[12px]" : ""
         }`}
@@ -66,51 +91,86 @@ function Field({ label, value, type = "text", mono }: FieldProps) {
   );
 }
 
-function Toggle({
-  label,
-  description,
-  defaultChecked = false,
-}: {
-  label: string;
-  description: string;
-  defaultChecked?: boolean;
-}) {
-  return (
-    <label className="flex items-start justify-between gap-6 py-3 first:pt-0 last:pb-0">
-      <div>
-        <div className="text-[13px] font-medium tracking-tight text-ink">
-          {label}
-        </div>
-        <div className="mt-0.5 text-[12px] text-neutral-500">{description}</div>
-      </div>
-      <span className="relative mt-1 inline-flex h-5 w-9 shrink-0 items-center">
-        <input
-          type="checkbox"
-          defaultChecked={defaultChecked}
-          className="peer sr-only"
+function StatusBanner({ state }: { state: SettingsState }) {
+  if (!state) return null;
+  if (state.ok) {
+    return (
+      <div className="mt-4 flex items-start gap-2 rounded-[10px] border border-emerald-100 bg-emerald-50 px-3 py-2 text-[12.5px] text-emerald-700">
+        <HugeiconsIcon
+          icon={Tick02Icon}
+          size={13}
+          strokeWidth={2}
+          className="mt-0.5 shrink-0"
         />
-        <span className="absolute inset-0 rounded-full bg-neutral-200 transition-colors peer-checked:bg-emerald-500" />
-        <span className="relative ml-0.5 inline-block h-4 w-4 rounded-full bg-white shadow-sm transition-transform peer-checked:translate-x-4" />
-      </span>
-    </label>
+        <span>{state.message}</span>
+      </div>
+    );
+  }
+  return (
+    <div className="mt-4 flex items-start gap-2 rounded-[10px] border border-rose-100 bg-rose-50 px-3 py-2 text-[12.5px] text-rose-700">
+      <HugeiconsIcon
+        icon={Alert02Icon}
+        size={13}
+        strokeWidth={1.75}
+        className="mt-0.5 shrink-0"
+      />
+      <span>{state.error}</span>
+    </div>
   );
 }
 
 export default function SettingsPage() {
+  const identity = useIdentity();
+  const [profileState, profileAction, profilePending] = useActionState<
+    SettingsState,
+    FormData
+  >(updateProfileAction, undefined);
+  const [passwordState, passwordAction, passwordPending] = useActionState<
+    SettingsState,
+    FormData
+  >(changePasswordAction, undefined);
+
+  const isGuest = identity.isGuest;
+
   return (
     <>
       <PageHeader
         title="Settings"
-        subtitle="Profile, notifications, and account preferences."
-        actions={
-          <button
-            type="button"
-            className="inline-flex h-9 items-center gap-1.5 rounded-[10px] bg-amber-400 px-3 text-[12px] font-semibold tracking-tight text-ink shadow-[0_2px_8px_rgb(251_191_36/0.35)] transition-colors hover:bg-amber-500"
-          >
-            Save changes
-          </button>
+        subtitle={
+          isGuest
+            ? "You're in guest mode. Create an account to save these preferences."
+            : "Profile, security, and account preferences."
         }
       />
+
+      {isGuest && (
+        <div className="mt-6 rounded-[16px] border border-amber-200 bg-amber-50/60 p-5">
+          <div className="font-mono text-[10px] uppercase tracking-[0.18em] text-amber-700">
+            Guest mode
+          </div>
+          <h3 className="mt-2 text-[15px] font-semibold tracking-tight text-ink">
+            Sign up to save your audits
+          </h3>
+          <p className="mt-1 max-w-[520px] text-[12.5px] leading-relaxed text-neutral-600">
+            Without an account, your audits and preferences are reset when you
+            close this tab. Create an account to keep them.
+          </p>
+          <div className="mt-4 flex items-center gap-3">
+            <a
+              href="/signup"
+              className="inline-flex h-9 items-center rounded-[10px] bg-amber-400 px-3 text-[12px] font-semibold tracking-tight text-ink shadow-[0_2px_8px_rgb(251_191_36/0.35)] transition-colors hover:bg-amber-500"
+            >
+              Create an account
+            </a>
+            <a
+              href="/login"
+              className="inline-flex h-9 items-center rounded-[10px] border border-neutral-200 bg-white px-3 text-[12px] tracking-tight text-ink transition-colors hover:border-neutral-400"
+            >
+              Sign in
+            </a>
+          </div>
+        </div>
+      )}
 
       <motion.div
         initial={{ opacity: 0, y: 12 }}
@@ -118,44 +178,101 @@ export default function SettingsPage() {
         transition={{ duration: 0.45, ease: EASE }}
         className="mt-7 rounded-[16px] border border-neutral-200/70 bg-white px-7"
       >
-        <Section
-          icon={Mail01Icon}
-          title="Profile"
-          description="How your name and contact info appear on demand letters."
-        >
-          <div className="grid gap-4 sm:grid-cols-2">
-            <Field label="Full name" value="Jamet Roy" />
-            <Field label="Email" value="jamet@recourse.io" type="email" />
-            <Field label="Phone" value="(415) 555-0142" mono />
-            <Field label="Mailing address" value="1842 Mission St, SF CA 94103" />
-          </div>
-        </Section>
+        <form action={profileAction}>
+          <Section
+            icon={Mail01Icon}
+            title="Profile"
+            description="How your name and contact info appear on demand letters."
+          >
+            <fieldset disabled={isGuest} className="space-y-4">
+              <div className="grid gap-4 sm:grid-cols-2">
+                <Field
+                  label="Full name"
+                  name="name"
+                  defaultValue={identity.user?.name ?? ""}
+                  required
+                />
+                <Field
+                  label="Email"
+                  name="email"
+                  type="email"
+                  defaultValue={identity.email}
+                  // Email change not supported here — readonly via disabled wrapper
+                />
+                <Field
+                  label="Phone"
+                  name="phone"
+                  type="tel"
+                  defaultValue={identity.user?.phone ?? ""}
+                  placeholder="(415) 555-0142"
+                  mono
+                />
+                <Field
+                  label="Mailing address"
+                  name="mailingAddress"
+                  defaultValue={identity.user?.mailingAddress ?? ""}
+                  placeholder="1842 Mission St, SF CA 94103"
+                />
+              </div>
+              {!isGuest && (
+                <div className="flex items-center justify-end">
+                  <button
+                    type="submit"
+                    disabled={profilePending}
+                    className="inline-flex h-9 items-center rounded-[10px] bg-amber-400 px-3 text-[12px] font-semibold tracking-tight text-ink shadow-[0_2px_8px_rgb(251_191_36/0.35)] transition-colors hover:bg-amber-500 disabled:cursor-not-allowed disabled:bg-amber-300 disabled:shadow-none"
+                  >
+                    {profilePending ? "Saving…" : "Save profile"}
+                  </button>
+                </div>
+              )}
+              <StatusBanner state={profileState} />
+            </fieldset>
+          </Section>
+        </form>
+
+        {!isGuest && (
+          <form action={passwordAction}>
+            <Section
+              icon={LockIcon}
+              title="Password"
+              description="Change the password used to sign into your Recourse account."
+            >
+              <div className="grid gap-4 sm:grid-cols-2">
+                <Field
+                  label="Current password"
+                  name="currentPassword"
+                  type="password"
+                  required
+                />
+                <Field
+                  label="New password"
+                  name="newPassword"
+                  type="password"
+                  required
+                />
+              </div>
+              <div className="mt-4 flex items-center justify-end">
+                <button
+                  type="submit"
+                  disabled={passwordPending}
+                  className="inline-flex h-9 items-center rounded-[10px] border border-neutral-200 bg-white px-3 text-[12px] tracking-tight text-ink transition-colors hover:border-neutral-400 disabled:cursor-not-allowed disabled:opacity-60"
+                >
+                  {passwordPending ? "Updating…" : "Update password"}
+                </button>
+              </div>
+              <StatusBanner state={passwordState} />
+            </Section>
+          </form>
+        )}
 
         <Section
           icon={Notification01Icon}
           title="Notifications"
           description="When Recourse should reach out about your bills."
         >
-          <div className="divide-y divide-neutral-100">
-            <Toggle
-              label="New statute matches"
-              description="Email me when a new bill triggers a verified violation."
-              defaultChecked
-            />
-            <Toggle
-              label="Provider responses"
-              description="Notify me when a provider replies to a demand letter."
-              defaultChecked
-            />
-            <Toggle
-              label="Library updates"
-              description="Tell me when the statute library version changes."
-            />
-            <Toggle
-              label="Weekly digest"
-              description="A Sunday recap of recovered amounts and active disputes."
-              defaultChecked
-            />
+          <div className="text-[12.5px] leading-relaxed text-neutral-500">
+            Notification preferences ship in the next release. For now, every
+            account opts in to weekly digests and statute-match alerts.
           </div>
         </Section>
 
@@ -164,17 +281,36 @@ export default function SettingsPage() {
           title="Privacy"
           description="Bills and personal data stay in your account. Recourse never resells PHI."
         >
-          <div className="divide-y divide-neutral-100">
-            <Toggle
-              label="Allow anonymized statute analytics"
-              description="Help us tighten the statute library — only category counts, never bill content."
-              defaultChecked
-            />
-            <Toggle
-              label="Auto-redact bills before storage"
-              description="Strip identifiers from uploaded bills after the audit completes."
-            />
-          </div>
+          <ul className="space-y-2 text-[12.5px] leading-relaxed text-neutral-600">
+            <li className="flex items-start gap-2">
+              <HugeiconsIcon
+                icon={Tick02Icon}
+                size={12}
+                strokeWidth={2}
+                className="mt-1 text-emerald-600"
+              />
+              Bills encrypted in transit and at rest.
+            </li>
+            <li className="flex items-start gap-2">
+              <HugeiconsIcon
+                icon={Tick02Icon}
+                size={12}
+                strokeWidth={2}
+                className="mt-1 text-emerald-600"
+              />
+              Audit findings stored only against your account.
+            </li>
+            <li className="flex items-start gap-2">
+              <HugeiconsIcon
+                icon={Tick02Icon}
+                size={12}
+                strokeWidth={2}
+                className="mt-1 text-emerald-600"
+              />
+              Statute library is verified against federal text — never
+              LLM-judged.
+            </li>
+          </ul>
         </Section>
 
         <Section
@@ -197,8 +333,8 @@ export default function SettingsPage() {
               </span>
             </div>
             <p className="mt-3 text-[12.5px] leading-relaxed text-neutral-600">
-              You&apos;ll only be charged when a provider refunds, voids, or reduces a
-              bill. Fees are itemized on every closed dispute.
+              You&apos;ll only be charged when a provider refunds, voids, or
+              reduces a bill. Fees are itemized on every closed dispute.
             </p>
           </div>
         </Section>
@@ -206,22 +342,47 @@ export default function SettingsPage() {
         <Section
           icon={Logout01Icon}
           title="Session"
-          description="Sign out of this device or close your account."
+          description={
+            isGuest
+              ? "Guest sessions don't need to be ended — close the tab to clear state."
+              : "Sign out of this device or close your account."
+          }
         >
-          <div className="flex items-center gap-3">
-            <a
-              href="/login"
-              className="inline-flex h-9 items-center rounded-[10px] border border-neutral-200 bg-white px-3 text-[12px] tracking-tight text-ink transition-colors hover:border-neutral-400"
-            >
-              Sign out
-            </a>
-            <button
-              type="button"
-              className="inline-flex h-9 items-center rounded-[10px] px-3 text-[12px] tracking-tight text-rose-600 transition-colors hover:bg-rose-50"
-            >
-              Close account
-            </button>
-          </div>
+          {isGuest ? (
+            <div className="text-[12.5px] text-neutral-500">
+              <a
+                href="/login"
+                className="text-ink underline-offset-4 hover:underline"
+              >
+                Sign in
+              </a>{" "}
+              to a saved account, or{" "}
+              <a
+                href="/signup"
+                className="text-ink underline-offset-4 hover:underline"
+              >
+                create one
+              </a>
+              .
+            </div>
+          ) : (
+            <div className="flex items-center gap-3">
+              <form action={signOutAction}>
+                <button
+                  type="submit"
+                  className="inline-flex h-9 items-center rounded-[10px] border border-neutral-200 bg-white px-3 text-[12px] tracking-tight text-ink transition-colors hover:border-neutral-400"
+                >
+                  Sign out
+                </button>
+              </form>
+              <button
+                type="button"
+                className="inline-flex h-9 items-center rounded-[10px] px-3 text-[12px] tracking-tight text-rose-600 transition-colors hover:bg-rose-50"
+              >
+                Close account
+              </button>
+            </div>
+          )}
         </Section>
       </motion.div>
     </>

@@ -1,11 +1,13 @@
 "use client";
 
 import type { ReactNode } from "react";
+import Link from "next/link";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
   Notification01Icon,
   Mail01Icon,
 } from "@hugeicons/core-free-icons";
+import { useIdentity } from "./UserContext";
 
 type PageHeaderProps = {
   title: string;
@@ -14,6 +16,7 @@ type PageHeaderProps = {
 };
 
 export function PageHeader({ title, subtitle, actions }: PageHeaderProps) {
+  const identity = useIdentity();
   return (
     <header className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
       <div className="min-w-0">
@@ -47,19 +50,39 @@ export function PageHeader({ title, subtitle, actions }: PageHeaderProps) {
           />
           <span className="absolute right-2 top-2 h-1.5 w-1.5 rounded-full bg-rose-500" />
         </button>
-        <div className="flex items-center gap-2 rounded-[12px] border border-neutral-100 bg-neutral-50 py-1 pl-1 sm:pr-3">
-          <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-[linear-gradient(135deg,#fcd34d,#fb923c)] text-[11px] font-semibold tracking-tight text-white">
-            JR
-          </span>
-          <div className="hidden leading-tight sm:block">
-            <div className="text-[12px] font-semibold tracking-tight text-ink">
-              Jamet Roy
+        {identity.isGuest ? (
+          <Link
+            href="/signup"
+            className="flex items-center gap-2 rounded-[12px] border border-amber-200 bg-amber-50/60 py-1 pl-1 transition-colors hover:bg-amber-50 sm:pr-3"
+            title="Create an account to save your audits"
+          >
+            <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-[linear-gradient(135deg,#fcd34d,#fb923c)] text-[11px] font-semibold tracking-tight text-white">
+              {identity.initials}
+            </span>
+            <div className="hidden leading-tight sm:block">
+              <div className="text-[12px] font-semibold tracking-tight text-ink">
+                Sign up
+              </div>
+              <div className="font-mono text-[9px] uppercase tracking-[0.16em] text-amber-700">
+                Guest mode
+              </div>
             </div>
-            <div className="font-mono text-[9px] uppercase tracking-[0.16em] text-neutral-400">
-              Patient
+          </Link>
+        ) : (
+          <div className="flex items-center gap-2 rounded-[12px] border border-neutral-100 bg-neutral-50 py-1 pl-1 sm:pr-3">
+            <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-[linear-gradient(135deg,#fcd34d,#fb923c)] text-[11px] font-semibold tracking-tight text-white">
+              {identity.initials}
+            </span>
+            <div className="hidden leading-tight sm:block">
+              <div className="text-[12px] font-semibold tracking-tight text-ink">
+                {identity.displayName}
+              </div>
+              <div className="font-mono text-[9px] uppercase tracking-[0.16em] text-neutral-400">
+                Patient
+              </div>
             </div>
           </div>
-        </div>
+        )}
       </div>
     </header>
   );

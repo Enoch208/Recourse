@@ -20,6 +20,7 @@ import {
 import type { AuditEvent } from "@/lib/audit/events";
 import type { BillFacts, Finding } from "@/lib/audit/schema";
 import { downloadLetterPdf, printLetterPdf } from "@/lib/audit/pdf";
+import { useIdentity } from "@/components/workspace/UserContext";
 
 type Phase = "upload" | "running" | "done" | "error";
 
@@ -28,6 +29,7 @@ function generateAuditId() {
 }
 
 export default function AuditWorkstation() {
+  const identity = useIdentity();
   const [phase, setPhase] = useState<Phase>("upload");
   const [file, setFile] = useState<File | null>(null);
   const [auditId, setAuditId] = useState<string>("");
@@ -279,14 +281,14 @@ export default function AuditWorkstation() {
             )}
             <div className="flex items-center gap-2 rounded-[10px] border border-neutral-100 bg-neutral-50/60 py-1 pl-1 sm:pr-3">
               <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-[linear-gradient(135deg,#fcd34d,#fb923c)] text-[10px] font-semibold tracking-tight text-white">
-                JR
+                {identity.initials}
               </span>
               <div className="hidden leading-tight sm:block">
                 <div className="text-[11.5px] font-semibold tracking-tight text-ink">
-                  J. Ramirez
+                  {identity.displayName}
                 </div>
                 <div className="font-mono text-[9px] uppercase tracking-[0.16em] text-neutral-400">
-                  Patient
+                  {identity.isGuest ? "Guest" : "Patient"}
                 </div>
               </div>
             </div>

@@ -7,6 +7,7 @@ import { PageHeader } from "@/components/workspace/PageHeader";
 import { ComparisonCard } from "@/components/workspace/ComparisonCard";
 import { GoalsCard } from "@/components/workspace/GoalsCard";
 import { AuditTrendCard } from "@/components/workspace/AuditTrendCard";
+import { useIdentity } from "@/components/workspace/UserContext";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 
@@ -16,11 +17,17 @@ const fadeIn = {
 };
 
 export default function WorkspacePage() {
+  const identity = useIdentity();
+  const firstName = identity.displayName.split(/\s+/)[0];
   return (
     <>
       <PageHeader
         title="My Summary"
-        subtitle="Welcome back, Jamet — 3 active disputes, $1,420 in flight."
+        subtitle={
+          identity.isGuest
+            ? `Welcome back, ${firstName} — 3 active disputes, $1,420 in flight.`
+            : `Welcome back, ${firstName} — your audits, in one place.`
+        }
         actions={
           <button
             type="button"

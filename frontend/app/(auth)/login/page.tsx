@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useActionState, useState } from "react";
 import Link from "next/link";
 import { motion } from "motion/react";
 import { HugeiconsIcon } from "@hugeicons/react";
@@ -9,8 +9,10 @@ import {
   ViewOffIcon,
   ArrowRight01Icon,
   LockIcon,
+  Alert02Icon,
 } from "@hugeicons/core-free-icons";
 import { GoogleLogo } from "@/components/primitives/GoogleLogo";
+import { loginAction, type AuthState } from "../actions";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 
@@ -18,8 +20,12 @@ export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [state, formAction, pending] = useActionState<AuthState, FormData>(
+    loginAction,
+    undefined
+  );
 
-  const canSubmit = email.length > 0 && password.length > 0;
+  const canSubmit = email.length > 0 && password.length > 0 && !pending;
 
   return (
     <motion.div
@@ -56,22 +62,19 @@ export default function LoginPage() {
           <span className="h-px flex-1 bg-neutral-200" />
         </div>
 
-        <form
-          className="space-y-4"
-          onSubmit={(e) => {
-            e.preventDefault();
-          }}
-        >
+        <form action={formAction} className="space-y-4">
           <label className="block">
             <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-neutral-500">
               Email
             </span>
             <input
               type="email"
+              name="email"
               autoComplete="email"
               placeholder="you@example.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              required
               className="mt-1.5 block h-11 w-full rounded-[10px] border border-neutral-200 bg-white px-3.5 text-[13.5px] tracking-tight text-ink placeholder:text-neutral-400 focus:border-ink focus:outline-none focus:ring-2 focus:ring-ink/10"
             />
           </label>
@@ -91,10 +94,12 @@ export default function LoginPage() {
             <div className="relative mt-1.5">
               <input
                 type={showPassword ? "text" : "password"}
+                name="password"
                 autoComplete="current-password"
                 placeholder="••••••••"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                required
                 className="block h-11 w-full rounded-[10px] border border-neutral-200 bg-white px-3.5 pr-11 font-mono text-[13px] tracking-tight text-ink placeholder:text-neutral-400 placeholder:font-sans focus:border-ink focus:outline-none focus:ring-2 focus:ring-ink/10"
               />
               <button
@@ -112,13 +117,31 @@ export default function LoginPage() {
             </div>
           </label>
 
+          {state?.error && (
+            <div className="flex items-start gap-2 rounded-[10px] border border-rose-100 bg-rose-50 px-3 py-2 text-[12.5px] text-rose-700">
+              <HugeiconsIcon
+                icon={Alert02Icon}
+                size={13}
+                strokeWidth={1.75}
+                className="mt-0.5 shrink-0"
+              />
+              <span>{state.error}</span>
+            </div>
+          )}
+
           <button
             type="submit"
             disabled={!canSubmit}
             className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-[10px] bg-amber-400 text-[13px] font-semibold tracking-tight text-ink shadow-[0_2px_8px_rgb(251_191_36/0.35)] transition-colors hover:bg-amber-500 disabled:cursor-not-allowed disabled:bg-amber-300 disabled:shadow-none"
           >
-            Sign in
-            <HugeiconsIcon icon={ArrowRight01Icon} size={14} strokeWidth={1.75} />
+            {pending ? "Signing in…" : "Sign in"}
+            {!pending && (
+              <HugeiconsIcon
+                icon={ArrowRight01Icon}
+                size={14}
+                strokeWidth={1.75}
+              />
+            )}
           </button>
         </form>
 
