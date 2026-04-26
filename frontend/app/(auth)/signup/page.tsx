@@ -5,14 +5,13 @@ import Link from "next/link";
 import { motion } from "motion/react";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
-  GoogleIcon,
-  AppleIcon,
   ViewIcon,
   ViewOffIcon,
   ArrowRight01Icon,
   Tick02Icon,
   LockIcon,
 } from "@hugeicons/core-free-icons";
+import { GoogleLogo } from "@/components/primitives/GoogleLogo";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 
@@ -53,20 +52,13 @@ export default function SignupPage() {
           </p>
         </div>
 
-        <div className="mt-7 grid grid-cols-2 gap-2.5">
+        <div className="mt-7">
           <button
             type="button"
-            className="inline-flex h-11 items-center justify-center gap-2 rounded-[10px] border border-neutral-200 bg-white text-[13px] tracking-tight text-ink transition-colors hover:border-neutral-400 hover:bg-neutral-50"
+            className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-[10px] border border-neutral-200 bg-white text-[13px] tracking-tight text-ink transition-colors hover:border-neutral-400 hover:bg-neutral-50"
           >
-            <HugeiconsIcon icon={GoogleIcon} size={16} strokeWidth={1.5} />
-            Google
-          </button>
-          <button
-            type="button"
-            className="inline-flex h-11 items-center justify-center gap-2 rounded-[10px] border border-neutral-200 bg-white text-[13px] tracking-tight text-ink transition-colors hover:border-neutral-400 hover:bg-neutral-50"
-          >
-            <HugeiconsIcon icon={AppleIcon} size={16} strokeWidth={1.5} />
-            Apple
+            <GoogleLogo size={16} />
+            Continue with Google
           </button>
         </div>
 
