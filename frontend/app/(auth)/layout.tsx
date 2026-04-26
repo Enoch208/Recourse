@@ -82,23 +82,6 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
         <div className="flex flex-1 items-center justify-center px-6 pb-12 pt-4 sm:pt-8 lg:pb-16">
           {children}
         </div>
-
-        <footer className="border-t border-neutral-200/70 bg-white px-6 py-4 lg:px-10">
-          <div className="mx-auto flex flex-col items-center justify-between gap-2 font-mono text-[10px] uppercase tracking-[0.16em] text-neutral-400 sm:flex-row sm:gap-0">
-            <span>256-bit encrypted · We never sell your data</span>
-            <div className="flex items-center gap-5">
-              <Link href="/" className="transition-colors hover:text-ink">
-                Privacy
-              </Link>
-              <Link href="/" className="transition-colors hover:text-ink">
-                Terms
-              </Link>
-              <Link href="/" className="transition-colors hover:text-ink">
-                Help
-              </Link>
-            </div>
-          </div>
-        </footer>
       </div>
     </div>
   );
