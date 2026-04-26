@@ -141,3 +141,171 @@ export async function auditStatsForUser(userId: string): Promise<{
   }
   return stats;
 }
+
+export type DashboardData = {
+  totalAudits: number;
+  thisMonthRecovered: number;
+  lastMonthRecovered: number;
+  monthDelta: number; // percentage change vs last month
+  byStatute: { code: string; count: number; percent: number }[];
+  mostFlagged: { code: string; count: number; percent: number }[];
+  recentAudit: {
+    provider: string;
+    filedISO: string;
+    auditId: string;
+    status: AuditStatus;
+  } | null;
+  topFacility: {
+    name: string;
+    thisMonth: number;
+    lastMonth: number;
+  } | null;
+  weeklyTrend: number[]; // 7 daily totals (Sun..Sat)
+};
+
+function ymOf(d: Date): { year: number; month: number } {
+  return { year: d.getUTCFullYear(), month: d.getUTCMonth() };
+}
+
+function sameYM(
+  a: { year: number; month: number },
+  b: { year: number; month: number }
+) {
+  return a.year === b.year && a.month === b.month;
+}
+
+function lastNDaysSums(docs: AuditDoc[], days: number): number[] {
+  const today = new Date();
+  today.setUTCHours(0, 0, 0, 0);
+  const out = new Array(days).fill(0);
+  for (const d of docs) {
+    const created = new Date(d.createdAt);
+    created.setUTCHours(0, 0, 0, 0);
+    const diffDays = Math.floor(
+      (today.getTime() - created.getTime()) / (1000 * 60 * 60 * 24)
+    );
+    if (diffDays >= 0 && diffDays < days) {
+      out[days - 1 - diffDays] += d.recoverableAmount;
+    }
+  }
+  return out;
+}
+
+export async function dashboardDataForUser(
+  userId: string
+): Promise<DashboardData> {
+  const empty: DashboardData = {
+    totalAudits: 0,
+    thisMonthRecovered: 0,
+    lastMonthRecovered: 0,
+    monthDelta: 0,
+    byStatute: [],
+    mostFlagged: [],
+    recentAudit: null,
+    topFacility: null,
+    weeklyTrend: [0, 0, 0, 0, 0, 0, 0],
+  };
+  if (!ObjectId.isValid(userId)) return empty;
+  const col = await audits();
+  const docs = await col
+    .find({ userId: new ObjectId(userId) })
+    .sort({ createdAt: -1 })
+    .toArray();
+  if (docs.length === 0) return empty;
+
+  const now = new Date();
+  const thisYM = ymOf(now);
+  const lastYMDate = new Date(now);
+  lastYMDate.setUTCMonth(lastYMDate.getUTCMonth() - 1);
+  const lastYM = ymOf(lastYMDate);
+
+  let thisMonthRecovered = 0;
+  let lastMonthRecovered = 0;
+
+  // Statute & facility tallies
+  const statuteCounts: Record<string, number> = {};
+  const facilityThisMonth: Record<string, number> = {};
+  const facilityLastMonth: Record<string, number> = {};
+
+  for (const d of docs) {
+    const dYM = ymOf(new Date(d.createdAt));
+    const facility = d.facts.provider.facility ?? d.facts.provider.name;
+    if (sameYM(dYM, thisYM)) {
+      thisMonthRecovered += d.recoverableAmount;
+      facilityThisMonth[facility] =
+        (facilityThisMonth[facility] ?? 0) + d.recoverableAmount;
+    } else if (sameYM(dYM, lastYM)) {
+      lastMonthRecovered += d.recoverableAmount;
+      facilityLastMonth[facility] =
+        (facilityLastMonth[facility] ?? 0) + d.recoverableAmount;
+    }
+    for (const f of d.findings) {
+      statuteCounts[f.statuteCode] = (statuteCounts[f.statuteCode] ?? 0) + 1;
+    }
+  }
+
+  const totalFindings = Object.values(statuteCounts).reduce(
+    (s, n) => s + n,
+    0
+  );
+
+  const byStatute = Object.entries(statuteCounts)
+    .map(([code, count]) => ({
+      code,
+      count,
+      percent:
+        totalFindings === 0 ? 0 : Math.round((count / totalFindings) * 100),
+    }))
+    .sort((a, b) => b.count - a.count);
+
+  const monthDelta =
+    lastMonthRecovered === 0
+      ? thisMonthRecovered > 0
+        ? 100
+        : 0
+      : Math.round(
+          ((thisMonthRecovered - lastMonthRecovered) / lastMonthRecovered) *
+            100
+        );
+
+  // Top facility — pick the largest this-month or fallback to last-month
+  const allFacilities = new Set([
+    ...Object.keys(facilityThisMonth),
+    ...Object.keys(facilityLastMonth),
+  ]);
+  let topName: string | null = null;
+  let topThis = 0;
+  for (const f of allFacilities) {
+    const t = facilityThisMonth[f] ?? 0;
+    const l = facilityLastMonth[f] ?? 0;
+    if (t + l > topThis) {
+      topThis = t + l;
+      topName = f;
+    }
+  }
+
+  const recent = docs[0];
+
+  return {
+    totalAudits: docs.length,
+    thisMonthRecovered,
+    lastMonthRecovered,
+    monthDelta,
+    byStatute,
+    mostFlagged: byStatute.slice(0, 2),
+    recentAudit: {
+      provider: recent.facts.provider.name,
+      filedISO: new Date(recent.createdAt).toISOString(),
+      auditId: recent.auditId,
+      status: recent.status,
+    },
+    topFacility: topName
+      ? {
+          name: topName,
+          thisMonth: facilityThisMonth[topName] ?? 0,
+          lastMonth: facilityLastMonth[topName] ?? 0,
+        }
+      : null,
+    weeklyTrend: lastNDaysSums(docs, 7),
+  };
+}

@@ -6,15 +6,55 @@ const RADIUS = 60;
 const STROKE = 8;
 const CIRC = 2 * Math.PI * RADIUS;
 
-const regions = [
-  { label: "NSA", percent: 34, dot: "bg-emerald-500" },
-  { label: "FDCPA", percent: 28, dot: "bg-sky-500" },
-  { label: "ERISA", percent: 22, dot: "bg-amber-500" },
-  { label: "HIPAA", percent: 16, dot: "bg-violet-500" },
+const MOCK_REGIONS = [
+  { code: "NSA", percent: 34 },
+  { code: "FDCPA", percent: 28 },
+  { code: "ERISA", percent: 22 },
+  { code: "HIPAA", percent: 16 },
 ];
 
-export function GoalsCard() {
-  const progress = 0.75;
+const TONES = ["bg-emerald-500", "bg-sky-500", "bg-amber-500", "bg-violet-500"];
+
+type Props = {
+  thisMonth?: number;
+  lastMonth?: number;
+  byStatute?: { code: string; percent: number }[];
+  empty?: boolean;
+};
+
+const usd = (n: number) =>
+  n.toLocaleString("en-US", {
+    style: "currency",
+    currency: "USD",
+    maximumFractionDigits: 0,
+  });
+
+export function GoalsCard({ thisMonth, lastMonth, byStatute, empty }: Props = {}) {
+  const isMock = thisMonth === undefined && !empty;
+  const t = thisMonth ?? 4200;
+  const l = lastMonth ?? 4008;
+  const regions = (byStatute && byStatute.length > 0
+    ? byStatute.slice(0, 4)
+    : MOCK_REGIONS
+  ).map((r, i) => ({ ...r, dot: TONES[i % TONES.length] }));
+
+  // Goal: "in flight + recovered" toward an arbitrary monthly target.
+  // For real users, base progress on this-month-recovered relative to a soft
+  // per-week target ($1,400 -> $5,600 monthly). Keeps the donut meaningful.
+  const monthlyGoal = 5600;
+  const progress = empty
+    ? 0
+    : Math.min(1, t / monthlyGoal) || (isMock ? 0.75 : 0);
+  const weekly = empty ? 0 : Math.round(t / 4) || (isMock ? 1050 : 0);
+  const monthChange =
+    isMock
+      ? 8.2
+      : l === 0
+        ? t > 0
+          ? 100
+          : 0
+        : Math.round(((t - l) / l) * 1000) / 10;
+
   return (
     <div className="rounded-2xl border border-neutral-100 bg-white p-6">
       <div className="flex items-center justify-between">
@@ -56,21 +96,23 @@ export function GoalsCard() {
               animate={{ strokeDasharray: `${CIRC * progress} ${CIRC}` }}
               transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
             />
-            <circle
-              cx="74"
-              cy={74 - RADIUS}
-              r={5}
-              fill="white"
-              stroke="rgb(16 185 129)"
-              strokeWidth={2.5}
-            />
+            {progress > 0 && (
+              <circle
+                cx="74"
+                cy={74 - RADIUS}
+                r={5}
+                fill="white"
+                stroke="rgb(16 185 129)"
+                strokeWidth={2.5}
+              />
+            )}
           </svg>
           <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
             <div className="font-mono text-[28px] leading-none tracking-tight text-ink">
-              75%
+              {Math.round(progress * 100)}%
             </div>
             <div className="mt-1.5 font-mono text-[10px] uppercase tracking-[0.16em] text-neutral-400">
-              $1,050 / week
+              {weekly > 0 ? `${usd(weekly)} / week` : "Awaiting audits"}
             </div>
           </div>
         </div>
@@ -82,8 +124,17 @@ export function GoalsCard() {
             This month
           </div>
           <div className="mt-1 flex items-baseline gap-1.5">
-            <span className="font-mono text-[15px] text-amber-600">$4,200</span>
-            <span className="font-mono text-[10px] text-emerald-600">+8.2%</span>
+            <span className="font-mono text-[15px] text-amber-600">
+              {usd(t)}
+            </span>
+            <span
+              className={`font-mono text-[10px] ${
+                monthChange >= 0 ? "text-emerald-600" : "text-rose-600"
+              }`}
+            >
+              {monthChange >= 0 ? "+" : ""}
+              {monthChange}%
+            </span>
           </div>
         </div>
         <div className="rounded-[10px] border border-neutral-100 bg-neutral-50/60 p-3">
@@ -91,8 +142,7 @@ export function GoalsCard() {
             Last month
           </div>
           <div className="mt-1 flex items-baseline gap-1.5">
-            <span className="font-mono text-[15px] text-ink">$4,008</span>
-            <span className="font-mono text-[10px] text-emerald-600">+4%</span>
+            <span className="font-mono text-[15px] text-ink">{usd(l)}</span>
           </div>
         </div>
       </div>
@@ -109,17 +159,23 @@ export function GoalsCard() {
             All ▾
           </button>
         </div>
-        <ul className="mt-3 grid grid-cols-2 gap-y-2.5 gap-x-4">
-          {regions.map((r) => (
-            <li key={r.label} className="flex items-center gap-2">
-              <span className={`h-1.5 w-1.5 rounded-full ${r.dot}`} />
-              <span className="text-[12px] text-ink">{r.label}</span>
-              <span className="ml-auto font-mono text-[11px] text-neutral-500">
-                {r.percent}%
-              </span>
-            </li>
-          ))}
-        </ul>
+        {regions.length === 0 ? (
+          <div className="mt-3 rounded-[10px] border border-dashed border-neutral-200 px-3 py-3 text-center font-mono text-[10px] uppercase tracking-[0.16em] text-neutral-400">
+            No statutes flagged yet
+          </div>
+        ) : (
+          <ul className="mt-3 grid grid-cols-2 gap-y-2.5 gap-x-4">
+            {regions.map((r) => (
+              <li key={r.code} className="flex items-center gap-2">
+                <span className={`h-1.5 w-1.5 rounded-full ${r.dot}`} />
+                <span className="truncate text-[12px] text-ink">{r.code}</span>
+                <span className="ml-auto font-mono text-[11px] text-neutral-500">
+                  {r.percent}%
+                </span>
+              </li>
+            ))}
+          </ul>
+        )}
       </div>
 
       <button
