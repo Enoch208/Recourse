@@ -20,6 +20,7 @@ type LetterInput = {
   findings: Finding[];
   body: string;
   auditId: string;
+  userName?: string | null;
 };
 
 // US Letter, points: 612 x 792
@@ -43,9 +44,16 @@ function setDraw(doc: jsPDF, c: readonly [number, number, number]) {
   doc.setDrawColor(c[0], c[1], c[2]);
 }
 
-export function buildLetterPdf({ facts, findings, body, auditId }: LetterInput): jsPDF {
+export function buildLetterPdf({
+  facts,
+  findings,
+  body,
+  auditId,
+  userName,
+}: LetterInput): jsPDF {
   const doc = new jsPDF({ unit: "pt", format: "letter" });
   let y = MARGIN_TOP;
+  const signatureName = userName?.trim() || facts.patient.name || "User";
 
   // ── Masthead ────────────────────────────────────────────────────
   doc.setFont("times", "bold");
@@ -146,13 +154,13 @@ export function buildLetterPdf({ facts, findings, body, auditId }: LetterInput):
   doc.setFont("times", "italic");
   doc.setFontSize(12);
   setColor(doc, COLOR_INK);
-  doc.text(facts.patient.name ?? "Patient", MARGIN_X, y);
+  doc.text(signatureName, MARGIN_X, y);
 
   y += 14;
   doc.setFont("courier", "normal");
   doc.setFontSize(8);
   setColor(doc, COLOR_FAINT);
-  doc.text("PATIENT · DRAFTED VIA RECOURSE", MARGIN_X, y);
+  doc.text("USER · DRAFTED VIA RECOURSE", MARGIN_X, y);
 
   // ── Footer (every page) ────────────────────────────────────────
   const totalPages = doc.getNumberOfPages();

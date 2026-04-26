@@ -78,7 +78,7 @@ export function PageHeader({ title, subtitle, actions }: PageHeaderProps) {
                 {identity.displayName}
               </div>
               <div className="font-mono text-[9px] uppercase tracking-[0.16em] text-neutral-400">
-                Patient
+                User
               </div>
             </div>
           </div>

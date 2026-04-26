@@ -1,5 +1,9 @@
 import type { BillFacts, Finding } from "./schema";
 
+export type DraftContext = {
+  userName?: string | null;
+};
+
 export const EXTRACTION_SYSTEM_PROMPT = `You are the extraction stage of Recourse, a tool that audits US medical bills against federal statute.
 
 Your only job is to read the attached document and produce a strict, factual JSON object that matches the BillFacts schema. You do not interpret the law. You do not draw legal conclusions. You report what is printed on the document.
@@ -28,6 +32,7 @@ export const DRAFT_SYSTEM_PROMPT = `You are the drafting stage of Recourse. You 
 You are given:
 - BillFacts: structural facts extracted from a single medical bill.
 - Findings: a verified list of statute matches produced by Recourse's deterministic matcher. Each finding includes a statute code, evidence, and remedy.
+- Recourse user context: the signed-in user's name when available.
 
 Your output is the body of one demand letter, in plain prose. The user-facing template will frame your output with a header, address block, and signature — you write only the legal body.
 
@@ -39,11 +44,16 @@ Hard rules:
 - Preserve exact statute citation strings: e.g. "NSA § 2799A-1", "FDCPA § 1692g", "HIPAA § 164.524".
 - Open with the strongest finding (largest recoverable amount). If two findings tie, prefer NSA over FDCPA over HIPAA.
 - Reference each finding in its own paragraph. Cite the statute, name the evidence, state the remedy.
+- If a Recourse user name is provided, include that exact name once in the opening paragraph as the sender/requesting user while presenting the strongest finding. Do not overwrite extracted bill facts, account numbers, dates, providers, or dollar amounts.
 - End with a single sentence demanding written response within thirty (30) days.
 
 Length: 180–280 words. Two to three paragraphs. No headings, no bullets — flowing legal prose only.`;
 
-export function buildDraftUserPrompt(facts: BillFacts, findings: Finding[]): string {
+export function buildDraftUserPrompt(
+  facts: BillFacts,
+  findings: Finding[],
+  context: DraftContext = {}
+): string {
   const findingsBlock = findings
     .map(
       (f, i) => `Finding ${i + 1}:
@@ -58,6 +68,8 @@ ${f.evidence.map((e) => `    - ${e.label}: ${e.value}`).join("\n")}
 
   return `Bill facts:
   Provider: ${facts.provider.name}
+  Recourse user name: ${context.userName?.trim() || "—"}
+  Extracted patient name on bill: ${facts.patient.name ?? "—"}
   Patient account: ${facts.patient.accountId ?? "—"}
   Date of service: ${facts.dateOfService}
   Total balance: $${facts.totalBalance.toFixed(2)}

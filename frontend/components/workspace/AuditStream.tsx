@@ -12,6 +12,7 @@ import {
 } from "@hugeicons/core-free-icons";
 import type { AuditPhase } from "@/lib/audit/events";
 import type { BillFacts, Finding } from "@/lib/audit/schema";
+import { useIdentity } from "./UserContext";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 
@@ -145,6 +146,7 @@ function DraftLetter({
   isStreaming,
   onReplay,
   auditId,
+  signerName,
 }: {
   facts: BillFacts | null;
   findings: Finding[];
@@ -152,6 +154,7 @@ function DraftLetter({
   isStreaming: boolean;
   onReplay?: () => void;
   auditId?: string;
+  signerName?: string | null;
 }) {
   if (!facts) return null;
   const today = new Date()
@@ -223,13 +226,13 @@ function DraftLetter({
           ))}
         </div>
 
-        {facts.patient.name && (
+        {signerName && (
           <div className="mt-7 border-t border-neutral-100 pt-5">
             <div className="font-display text-[12.5px] italic text-ink">
-              {facts.patient.name}
+              {signerName}
             </div>
             <div className="mt-1 font-mono text-[9px] uppercase tracking-[0.18em] text-neutral-400">
-              Patient · drafted via Recourse
+              User · drafted via Recourse
             </div>
           </div>
         )}
@@ -378,6 +381,7 @@ export function AuditStream({
   onReplay,
   auditId,
 }: Props) {
+  const identity = useIdentity();
   const showDraft = state === "drafting" || state === "done";
   const showVerifiedClean = state === "verified-clean";
   const showRejected = state === "rejected";
@@ -386,6 +390,9 @@ export function AuditStream({
     (sum, f) => sum + f.recoverableAmount,
     0
   );
+  const signerName = identity.isGuest
+    ? facts?.patient.name
+    : identity.displayName;
 
   return (
     <div className="flex h-full flex-col">
@@ -503,6 +510,7 @@ export function AuditStream({
                   isStreaming={isStreaming}
                   onReplay={onReplay}
                   auditId={auditId}
+                  signerName={signerName}
                 />
               </motion.div>
             ) : (

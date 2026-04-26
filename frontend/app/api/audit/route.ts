@@ -4,7 +4,7 @@ import { matchStatutes } from "@/lib/audit/statutes";
 import { streamLetterDraft } from "@/lib/audit/draft";
 import {
   MEMORIAL_HEALTH_FIXTURE,
-  MEMORIAL_HEALTH_LETTER,
+  memorialHealthLetterForUser,
 } from "@/lib/audit/fixtures";
 import { encodeEvent, nowTs, type AuditEvent } from "@/lib/audit/events";
 import type { BillFacts, Finding } from "@/lib/audit/schema";
@@ -88,6 +88,9 @@ export async function POST(req: NextRequest) {
       { status: 503 }
     );
   }
+
+  const user = await getCurrentUser();
+  const userName = user?.name ?? null;
 
   let cancelled = false;
   const stream = new ReadableStream<Uint8Array>({
@@ -231,7 +234,7 @@ export async function POST(req: NextRequest) {
 
           let draftFailed = false;
           try {
-            const result = streamLetterDraft(facts, findings);
+            const result = streamLetterDraft(facts, findings, { userName });
             for await (const delta of result.textStream) {
               if (cancelled) break;
               body += delta;
@@ -250,10 +253,11 @@ export async function POST(req: NextRequest) {
           // stream the cached Memorial Health letter so the demo never errors.
           if (draftFailed && parsed.useFixture) {
             body = "";
+            const fallbackLetter = memorialHealthLetterForUser(userName);
             const chunkSize = 32;
-            for (let i = 0; i < MEMORIAL_HEALTH_LETTER.length; i += chunkSize) {
+            for (let i = 0; i < fallbackLetter.length; i += chunkSize) {
               if (cancelled) break;
-              const token = MEMORIAL_HEALTH_LETTER.slice(i, i + chunkSize);
+              const token = fallbackLetter.slice(i, i + chunkSize);
               body += token;
               send({ type: "draft-token", token });
               await pause(40);
@@ -272,7 +276,6 @@ export async function POST(req: NextRequest) {
 
         // Persist for logged-in users (guests just get the live experience)
         try {
-          const user = await getCurrentUser();
           if (user && findings.length > 0 && !cancelled) {
             await saveAudit({
               userId: user.id,

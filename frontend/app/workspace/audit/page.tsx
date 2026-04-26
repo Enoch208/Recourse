@@ -211,8 +211,21 @@ export default function AuditWorkstation() {
 
   const downloadLetter = useCallback(() => {
     if (!facts || !draftBody) return;
-    downloadLetterPdf({ facts, findings, body: draftBody, auditId });
-  }, [facts, draftBody, findings, auditId]);
+    downloadLetterPdf({
+      facts,
+      findings,
+      body: draftBody,
+      auditId,
+      userName: identity.isGuest ? undefined : identity.displayName,
+    });
+  }, [
+    facts,
+    draftBody,
+    findings,
+    auditId,
+    identity.displayName,
+    identity.isGuest,
+  ]);
 
   const showSplit = phase !== "upload";
   const isLetterReady = phase === "done" && draftBody.length > 0;
@@ -276,7 +289,7 @@ export default function AuditWorkstation() {
                   {identity.displayName}
                 </div>
                 <div className="font-mono text-[9px] uppercase tracking-[0.16em] text-neutral-400">
-                  {identity.isGuest ? "Guest" : "Patient"}
+                  {identity.isGuest ? "Guest" : "User"}
                 </div>
               </div>
             </div>

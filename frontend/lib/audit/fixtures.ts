@@ -10,6 +10,16 @@ Additionally, one line item — procedure code 80053, a comprehensive metabolic 
 
 Memorial Health Medical Center is requested to provide a written response addressing each of the foregoing items within thirty (30) days of receipt of this letter.`;
 
+export function memorialHealthLetterForUser(userName?: string | null): string {
+  const trimmedName = userName?.trim();
+  if (!trimmedName) return MEMORIAL_HEALTH_LETTER;
+
+  return MEMORIAL_HEALTH_LETTER.replace(
+    "This letter is submitted on behalf of the patient identified under account BA-2026-1298",
+    `This letter is submitted by ${trimmedName} concerning account BA-2026-1298`
+  );
+}
+
 export const MEMORIAL_HEALTH_FIXTURE: BillFacts = {
   documentType: "medical_bill",
   confidence: "high",
