@@ -125,8 +125,8 @@ export default function BillsPage() {
         transition={{ duration: 0.45, ease: EASE }}
         className="mt-7"
       >
-        <div className="flex items-center justify-between gap-4">
-          <div className="flex items-center gap-1.5">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
+          <div className="flex flex-wrap items-center gap-1.5">
             {filters.map((label, i) => (
               <button
                 key={label}
@@ -141,7 +141,7 @@ export default function BillsPage() {
               </button>
             ))}
           </div>
-          <div className="relative">
+          <div className="relative w-full sm:w-auto">
             <HugeiconsIcon
               icon={Search01Icon}
               size={13}
@@ -151,12 +151,14 @@ export default function BillsPage() {
             <input
               type="search"
               placeholder="Search by provider or audit ID"
-              className="h-9 w-[280px] rounded-[10px] border border-neutral-200 bg-white pl-8 pr-3 text-[12.5px] tracking-tight text-ink placeholder:text-neutral-400 focus:border-neutral-400 focus:outline-none"
+              className="h-9 w-full rounded-[10px] border border-neutral-200 bg-white pl-8 pr-3 text-[12.5px] tracking-tight text-ink placeholder:text-neutral-400 focus:border-neutral-400 focus:outline-none sm:w-[280px]"
             />
           </div>
         </div>
 
         <div className="mt-5 overflow-hidden rounded-[16px] border border-neutral-200/70 bg-white">
+         <div className="overflow-x-auto">
+          <div className="min-w-[820px]">
           <div className="grid grid-cols-[1.4fr_0.9fr_0.7fr_1.3fr_0.7fr_auto] gap-4 border-b border-neutral-100 px-5 py-3 font-mono text-[10px] uppercase tracking-[0.16em] text-neutral-400">
             <span>Provider</span>
             <span>Date of service</span>
@@ -222,9 +224,11 @@ export default function BillsPage() {
               </div>
             </Link>
           ))}
+          </div>
+         </div>
         </div>
 
-        <div className="mt-3 flex items-center justify-between font-mono text-[10px] uppercase tracking-[0.16em] text-neutral-400">
+        <div className="mt-3 flex flex-col gap-1 font-mono text-[10px] uppercase tracking-[0.16em] text-neutral-400 sm:flex-row sm:items-center sm:justify-between">
           <span>Showing 6 of {bills.length} bills</span>
           <span>Library v1.4 · Verified</span>
         </div>

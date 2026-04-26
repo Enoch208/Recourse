@@ -219,27 +219,27 @@ export default function AuditWorkstation() {
   const isLetterReady = phase === "done" && draftBody.length > 0;
 
   return (
-    <div className="min-h-screen bg-[#EEF2FB] p-4 lg:p-6">
-      <div className="mx-auto flex h-[calc(100vh-32px)] max-w-[1440px] flex-col overflow-hidden rounded-[20px] border border-white/80 bg-white shadow-[0_8px_30px_rgb(15_23_42/0.06)] lg:h-[calc(100vh-48px)]">
-        <header className="flex h-14 shrink-0 items-center justify-between border-b border-neutral-100 bg-white px-5">
-          <div className="flex items-center gap-3">
+    <div className="min-h-screen bg-[#EEF2FB] p-3 sm:p-4 lg:p-6">
+      <div className="mx-auto flex min-h-[calc(100vh-24px)] max-w-[1440px] flex-col overflow-hidden rounded-[20px] border border-white/80 bg-white shadow-[0_8px_30px_rgb(15_23_42/0.06)] sm:min-h-[calc(100vh-32px)] lg:h-[calc(100vh-48px)] lg:min-h-0">
+        <header className="flex shrink-0 flex-col gap-3 border-b border-neutral-100 bg-white px-4 py-3 sm:h-14 sm:flex-row sm:items-center sm:justify-between sm:gap-0 sm:px-5 sm:py-0">
+          <div className="flex min-w-0 items-center gap-3">
             <Link
               href="/workspace"
-              className="inline-flex items-center gap-1.5 rounded-[8px] border border-neutral-200 bg-white px-2.5 py-1.5 text-[12px] tracking-tight text-neutral-600 transition-colors hover:border-neutral-400 hover:text-ink"
+              className="inline-flex shrink-0 items-center gap-1.5 rounded-[8px] border border-neutral-200 bg-white px-2.5 py-1.5 text-[12px] tracking-tight text-neutral-600 transition-colors hover:border-neutral-400 hover:text-ink"
             >
               <HugeiconsIcon icon={ArrowLeft01Icon} size={12} strokeWidth={1.5} />
               Back
             </Link>
-            <span className="h-4 w-px bg-neutral-200" />
-            <div className="flex items-center gap-2.5">
-              <span className="inline-flex h-7 w-7 items-center justify-center rounded-[8px] bg-emerald-50 text-emerald-700">
+            <span className="hidden h-4 w-px bg-neutral-200 sm:block" />
+            <div className="flex min-w-0 items-center gap-2.5">
+              <span className="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-[8px] bg-emerald-50 text-emerald-700">
                 <span className="font-mono text-[10px] font-semibold">RCS</span>
               </span>
-              <div className="leading-tight">
-                <div className="text-[13px] font-semibold tracking-tight text-ink">
+              <div className="min-w-0 leading-tight">
+                <div className="truncate text-[13px] font-semibold tracking-tight text-ink">
                   {facts?.provider.name ?? "New audit"}
                 </div>
-                <div className="font-mono text-[10px] uppercase tracking-[0.16em] text-neutral-400">
+                <div className="truncate font-mono text-[10px] uppercase tracking-[0.16em] text-neutral-400">
                   {auditId
                     ? `Audit · ${auditId}${facts ? ` · DOS ${facts.dateOfService}` : ""}`
                     : "Awaiting bill"}
@@ -248,7 +248,7 @@ export default function AuditWorkstation() {
             </div>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             {showSplit && (
               <>
                 <button
@@ -271,16 +271,17 @@ export default function AuditWorkstation() {
                     size={13}
                     strokeWidth={1.75}
                   />
-                  Download letter
+                  <span className="hidden sm:inline">Download letter</span>
+                  <span className="sm:hidden">PDF</span>
                 </button>
-                <span className="h-4 w-px bg-neutral-200" />
+                <span className="hidden h-4 w-px bg-neutral-200 sm:block" />
               </>
             )}
-            <div className="flex items-center gap-2 rounded-[10px] border border-neutral-100 bg-neutral-50/60 py-1 pl-1 pr-3">
+            <div className="flex items-center gap-2 rounded-[10px] border border-neutral-100 bg-neutral-50/60 py-1 pl-1 sm:pr-3">
               <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-[linear-gradient(135deg,#fcd34d,#fb923c)] text-[10px] font-semibold tracking-tight text-white">
                 JR
               </span>
-              <div className="leading-tight">
+              <div className="hidden leading-tight sm:block">
                 <div className="text-[11.5px] font-semibold tracking-tight text-ink">
                   J. Ramirez
                 </div>
@@ -293,10 +294,10 @@ export default function AuditWorkstation() {
         </header>
 
         {showSplit ? (
-          <div className="flex flex-1 min-h-0">
+          <div className="flex flex-1 min-h-0 flex-col lg:flex-row">
             <section
               aria-label="Evidence"
-              className="w-2/5 shrink-0 overflow-y-auto border-r border-neutral-100 bg-[#F5F7FA] px-6 py-7"
+              className="shrink-0 overflow-y-auto border-b border-neutral-100 bg-[#F5F7FA] px-4 py-6 sm:px-6 sm:py-7 lg:w-2/5 lg:border-b-0 lg:border-r"
             >
               <div className="mb-5 flex items-center justify-between">
                 <h2 className="text-[14px] font-semibold tracking-tight text-ink">

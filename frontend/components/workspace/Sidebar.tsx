@@ -1,10 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
-import { motion } from "motion/react";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
   DashboardCircleIcon,
@@ -15,6 +14,7 @@ import {
   HelpCircleIcon,
   UploadIcon,
   ArrowLeft01Icon,
+  Cancel01Icon,
 } from "@hugeicons/core-free-icons";
 import type { IconSvgElement } from "@hugeicons/react";
 
@@ -39,25 +39,31 @@ function isActive(pathname: string | null, href: string) {
   return pathname === href || pathname.startsWith(href + "/");
 }
 
-const EASE = [0.22, 1, 0.36, 1] as const;
-const EXPANDED_WIDTH = 232;
-const COLLAPSED_WIDTH = 72;
+type SidebarProps = {
+  mobileOpen?: boolean;
+  onMobileClose?: () => void;
+};
 
-export function Sidebar() {
+export function Sidebar({ mobileOpen = false, onMobileClose }: SidebarProps) {
   const [collapsed, setCollapsed] = useState(false);
   const pathname = usePathname();
 
+  // Auto-close mobile drawer on route change
+  useEffect(() => {
+    if (mobileOpen && onMobileClose) onMobileClose();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pathname]);
+
   return (
-    <motion.aside
-      initial={false}
-      animate={{ width: collapsed ? COLLAPSED_WIDTH : EXPANDED_WIDTH }}
-      transition={{ duration: 0.28, ease: EASE }}
-      className="sticky top-0 flex h-screen shrink-0 flex-col overflow-hidden border-r border-neutral-200/70 bg-white"
+    <aside
+      className={`fixed inset-y-0 left-0 z-50 flex h-dvh shrink-0 flex-col overflow-hidden border-r border-neutral-200/70 bg-white transition-transform duration-300 ease-out lg:sticky lg:top-0 lg:h-screen lg:translate-x-0 lg:transition-[width] ${
+        mobileOpen ? "translate-x-0 shadow-2xl" : "-translate-x-full lg:shadow-none"
+      } w-[280px] ${collapsed ? "lg:w-[76px]" : "lg:w-[232px]"}`}
     >
       <div
-        className={`flex h-[60px] shrink-0 items-center ${
-          collapsed ? "justify-center px-3" : "px-6"
-        }`}
+        className={`flex h-[60px] shrink-0 items-center justify-between ${
+          collapsed ? "lg:justify-center lg:px-3" : "lg:px-6"
+        } px-5`}
       >
         <Link href="/" aria-label="Recourse home" className="inline-flex items-center">
           {collapsed ? (
@@ -68,18 +74,29 @@ export function Sidebar() {
               height={62}
               priority
               style={{ height: 24, width: "auto" }}
+              className="lg:block hidden"
             />
-          ) : (
-            <Image
-              src="/logo_with_text.png"
-              alt="Recourse"
-              width={1180}
-              height={190}
-              priority
-              style={{ height: 20, width: "auto" }}
-            />
-          )}
+          ) : null}
+          <Image
+            src="/logo_with_text.png"
+            alt="Recourse"
+            width={1180}
+            height={190}
+            priority
+            style={{ height: 20, width: "auto" }}
+            className={collapsed ? "lg:hidden" : "block"}
+          />
         </Link>
+        {onMobileClose && (
+          <button
+            type="button"
+            onClick={onMobileClose}
+            aria-label="Close menu"
+            className="inline-flex h-8 w-8 items-center justify-center rounded-[8px] text-neutral-500 transition-colors hover:bg-neutral-100 hover:text-ink lg:hidden"
+          >
+            <HugeiconsIcon icon={Cancel01Icon} size={16} strokeWidth={1.75} />
+          </button>
+        )}
       </div>
 
       <nav className="mt-5 flex flex-col gap-1 px-3">
@@ -156,7 +173,7 @@ export function Sidebar() {
           </div>
         )}
 
-        <div className="mt-1 border-t border-neutral-100 pt-2">
+        <div className="mt-1 hidden border-t border-neutral-100 pt-2 lg:block">
           <button
             type="button"
             onClick={() => setCollapsed((c) => !c)}
@@ -177,6 +194,6 @@ export function Sidebar() {
           </button>
         </div>
       </div>
-    </motion.aside>
+    </aside>
   );
 }

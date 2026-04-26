@@ -125,8 +125,8 @@ export default function StatutesPage() {
         transition={{ duration: 0.45, ease: EASE }}
         className="mt-7"
       >
-        <div className="flex items-center justify-between gap-4">
-          <div className="flex items-center gap-1.5">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
+          <div className="flex flex-wrap items-center gap-1.5">
             {categories.map((label, i) => (
               <button
                 key={label}
@@ -141,7 +141,7 @@ export default function StatutesPage() {
               </button>
             ))}
           </div>
-          <div className="relative">
+          <div className="relative w-full sm:w-auto">
             <HugeiconsIcon
               icon={Search01Icon}
               size={13}
@@ -151,7 +151,7 @@ export default function StatutesPage() {
             <input
               type="search"
               placeholder="Search citations or triggers"
-              className="h-9 w-[280px] rounded-[10px] border border-neutral-200 bg-white pl-8 pr-3 text-[12.5px] tracking-tight text-ink placeholder:text-neutral-400 focus:border-neutral-400 focus:outline-none"
+              className="h-9 w-full rounded-[10px] border border-neutral-200 bg-white pl-8 pr-3 text-[12.5px] tracking-tight text-ink placeholder:text-neutral-400 focus:border-neutral-400 focus:outline-none sm:w-[280px]"
             />
           </div>
         </div>

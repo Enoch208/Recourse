@@ -184,6 +184,8 @@ export default function ResolvedPage() {
           transition={{ duration: 0.45, ease: EASE }}
           className="overflow-hidden rounded-[16px] border border-neutral-200/70 bg-white"
         >
+         <div className="overflow-x-auto">
+          <div className="min-w-[760px]">
           <div className="grid grid-cols-[1.5fr_0.9fr_0.8fr_1fr_0.8fr_auto] gap-4 border-b border-neutral-100 px-5 py-3 font-mono text-[10px] uppercase tracking-[0.16em] text-neutral-400">
             <span>Facility</span>
             <span>Closed</span>
@@ -233,6 +235,8 @@ export default function ResolvedPage() {
               </div>
             </Link>
           ))}
+          </div>
+         </div>
         </motion.div>
       </motion.div>
     </>
