@@ -76,7 +76,7 @@ flowchart TD
     end
 
     subgraph Server[Next.js App Router + API]
-      B1[/api/audit SSE route]
+      B1["/api/audit (SSE)"]
       B2[Auth session helpers]
       B3[MongoDB persistence]
     end
