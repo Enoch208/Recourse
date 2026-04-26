@@ -36,13 +36,22 @@ export const brand = {
   tagline: "You have recourse.",
 };
 
-type Sponsor = { label: string; logo?: string; href?: string };
+type Sponsor = {
+  label: string;
+  logo?: string;
+  href?: string;
+  showLabel?: boolean;
+};
 
 export const poweredBy = {
   eyebrow: "Powered by",
   sponsors: [
-    { label: "BlackWPT", logo: "/blackwptlogo.png" },
-    { label: "/dev/color", logo: "/devcolor.png" },
+    {
+      label: "Hack-Nation",
+      logo: "/hacknation_logo.png",
+      href: "https://hack-nation.ai",
+      showLabel: true,
+    },
     { label: "Anthropic" },
     { label: "Vercel" },
     { label: "Next.js" },

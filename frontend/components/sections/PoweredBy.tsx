@@ -5,22 +5,47 @@ import { motion } from "motion/react";
 import { Container } from "@/components/primitives/Container";
 import { poweredBy } from "@/lib/content";
 
-type Sponsor = { label: string; logo?: string; href?: string };
+type Sponsor = {
+  label: string;
+  logo?: string;
+  href?: string;
+  showLabel?: boolean;
+};
 
 function SponsorTile({ sponsor }: { sponsor: Sponsor }) {
-  const inner = sponsor.logo ? (
-    <Image
-      src={sponsor.logo}
-      alt={sponsor.label}
-      width={140}
-      height={28}
-      className="h-7 w-auto opacity-60 grayscale transition-[opacity,filter] duration-200 hover:opacity-100 hover:grayscale-0"
-    />
-  ) : (
-    <span className="font-display whitespace-nowrap text-[22px] tracking-tight text-muted transition-colors duration-200 hover:text-ink">
-      {sponsor.label}
-    </span>
-  );
+  let inner: React.ReactNode;
+  if (sponsor.logo && sponsor.showLabel) {
+    inner = (
+      <span className="group inline-flex items-center gap-2.5 whitespace-nowrap text-muted transition-colors duration-200 hover:text-ink">
+        <Image
+          src={sponsor.logo}
+          alt=""
+          width={56}
+          height={56}
+          className="h-7 w-7 object-contain opacity-70 transition-opacity duration-200 group-hover:opacity-100"
+        />
+        <span className="font-display text-[22px] tracking-tight">
+          {sponsor.label}
+        </span>
+      </span>
+    );
+  } else if (sponsor.logo) {
+    inner = (
+      <Image
+        src={sponsor.logo}
+        alt={sponsor.label}
+        width={140}
+        height={28}
+        className="h-7 w-auto opacity-60 grayscale transition-[opacity,filter] duration-200 hover:opacity-100 hover:grayscale-0"
+      />
+    );
+  } else {
+    inner = (
+      <span className="font-display whitespace-nowrap text-[22px] tracking-tight text-muted transition-colors duration-200 hover:text-ink">
+        {sponsor.label}
+      </span>
+    );
+  }
 
   if (sponsor.href) {
     return (
