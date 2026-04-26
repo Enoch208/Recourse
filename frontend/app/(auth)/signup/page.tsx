@@ -18,9 +18,9 @@ import { signupAction, type AuthState } from "../actions";
 const EASE = [0.22, 1, 0.36, 1] as const;
 
 const passwordChecks = [
-  { label: "At least 8 characters", test: (p: string) => p.length >= 8 },
-  { label: "One number", test: (p: string) => /\d/.test(p) },
-  { label: "One letter", test: (p: string) => /[A-Za-z]/.test(p) },
+  { label: "8+ chars", test: (p: string) => p.length >= 8 },
+  { label: "1 number", test: (p: string) => /\d/.test(p) },
+  { label: "1 letter", test: (p: string) => /[A-Za-z]/.test(p) },
 ];
 
 export default function SignupPage() {
@@ -139,21 +139,33 @@ export default function SignupPage() {
               </button>
             </div>
             {password.length > 0 && (
-              <ul className="mt-2.5 flex flex-wrap items-center gap-x-3 gap-y-1.5">
+              <ul className="mt-2.5 flex flex-wrap items-center gap-1.5">
                 {passwordChecks.map((c) => {
                   const ok = c.test(password);
                   return (
                     <li
                       key={c.label}
-                      className={`inline-flex items-center gap-1 whitespace-nowrap font-mono text-[10px] uppercase tracking-[0.12em] transition-colors ${
-                        ok ? "text-emerald-600" : "text-neutral-400"
+                      className={`inline-flex items-center gap-1.5 whitespace-nowrap rounded-full px-2 py-0.5 font-mono text-[10px] uppercase tracking-[0.12em] transition-colors ${
+                        ok
+                          ? "bg-emerald-50 text-emerald-700"
+                          : "bg-neutral-100 text-neutral-400"
                       }`}
                     >
-                      <HugeiconsIcon
-                        icon={Tick02Icon}
-                        size={10}
-                        strokeWidth={2.5}
-                      />
+                      <span
+                        className={`flex h-3 w-3 shrink-0 items-center justify-center rounded-full transition-colors ${
+                          ok
+                            ? "bg-emerald-500 text-white"
+                            : "border border-neutral-300 bg-white"
+                        }`}
+                      >
+                        {ok && (
+                          <HugeiconsIcon
+                            icon={Tick02Icon}
+                            size={8}
+                            strokeWidth={3}
+                          />
+                        )}
+                      </span>
                       {c.label}
                     </li>
                   );
