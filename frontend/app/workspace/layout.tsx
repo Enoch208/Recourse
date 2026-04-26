@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import { getCurrentUser } from "@/lib/auth/server";
+import { auditStatsForUser } from "@/lib/db/audits";
 import { UserProvider } from "@/components/workspace/UserContext";
 
 export default async function WorkspaceLayout({
@@ -8,5 +9,10 @@ export default async function WorkspaceLayout({
   children: ReactNode;
 }) {
   const user = await getCurrentUser();
-  return <UserProvider user={user}>{children}</UserProvider>;
+  const stats = user ? await auditStatsForUser(user.id) : null;
+  return (
+    <UserProvider user={user} stats={stats}>
+      {children}
+    </UserProvider>
+  );
 }

@@ -139,19 +139,19 @@ export default function SignupPage() {
               </button>
             </div>
             {password.length > 0 && (
-              <ul className="mt-2 grid grid-cols-3 gap-1.5">
+              <ul className="mt-2.5 flex flex-wrap items-center gap-x-3 gap-y-1.5">
                 {passwordChecks.map((c) => {
                   const ok = c.test(password);
                   return (
                     <li
                       key={c.label}
-                      className={`flex items-center gap-1 font-mono text-[9.5px] uppercase tracking-[0.12em] transition-colors ${
+                      className={`inline-flex items-center gap-1 whitespace-nowrap font-mono text-[10px] uppercase tracking-[0.12em] transition-colors ${
                         ok ? "text-emerald-600" : "text-neutral-400"
                       }`}
                     >
                       <HugeiconsIcon
                         icon={Tick02Icon}
-                        size={9}
+                        size={10}
                         strokeWidth={2.5}
                       />
                       {c.label}

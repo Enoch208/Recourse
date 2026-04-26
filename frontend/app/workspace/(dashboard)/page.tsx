@@ -16,6 +16,31 @@ const fadeIn = {
   visible: { opacity: 1, y: 0 },
 };
 
+function buildSubtitle(
+  isGuest: boolean,
+  firstName: string,
+  stats: ReturnType<typeof useIdentity>["stats"]
+): string {
+  if (isGuest) {
+    return `Welcome back, ${firstName} — 3 active disputes, $1,420 in flight.`;
+  }
+  if (!stats || stats.totalAudits === 0) {
+    return `Welcome back, ${firstName} — ingest your first bill to start an audit.`;
+  }
+  const inFlight = stats.activeCount + stats.draftingCount;
+  if (inFlight === 0) {
+    return `Welcome back, ${firstName} — every dispute resolved.`;
+  }
+  const usd = stats.totalRecoverable.toLocaleString("en-US", {
+    style: "currency",
+    currency: "USD",
+    maximumFractionDigits: 0,
+  });
+  return `Welcome back, ${firstName} — ${inFlight} active dispute${
+    inFlight === 1 ? "" : "s"
+  }, ${usd} in flight.`;
+}
+
 export default function WorkspacePage() {
   const identity = useIdentity();
   const firstName = identity.displayName.split(/\s+/)[0];
@@ -23,11 +48,7 @@ export default function WorkspacePage() {
     <>
       <PageHeader
         title="My Summary"
-        subtitle={
-          identity.isGuest
-            ? `Welcome back, ${firstName} — 3 active disputes, $1,420 in flight.`
-            : `Welcome back, ${firstName} — your audits, in one place.`
-        }
+        subtitle={buildSubtitle(identity.isGuest, firstName, identity.stats)}
         actions={
           <button
             type="button"

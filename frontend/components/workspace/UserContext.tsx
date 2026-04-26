@@ -3,12 +3,31 @@
 import { createContext, useContext, type ReactNode } from "react";
 import type { PublicUser } from "@/lib/db/users";
 
+export type WorkspaceStats = {
+  totalAudits: number;
+  activeCount: number;
+  draftingCount: number;
+  resolvedCount: number;
+  totalRecoverable: number;
+  totalRecovered: number;
+};
+
 export type WorkspaceIdentity = {
   user: PublicUser | null; // null = guest
   isGuest: boolean;
   displayName: string;
   initials: string;
   email: string;
+  stats: WorkspaceStats | null;
+};
+
+const EMPTY_GUEST_IDENTITY: WorkspaceIdentity = {
+  user: null,
+  isGuest: true,
+  displayName: "J. Ramirez",
+  initials: "JR",
+  email: "guest@recourse.io",
+  stats: null,
 };
 
 const Ctx = createContext<WorkspaceIdentity | null>(null);
@@ -22,9 +41,11 @@ function deriveInitials(name: string): string {
 
 export function UserProvider({
   user,
+  stats,
   children,
 }: {
   user: PublicUser | null;
+  stats?: WorkspaceStats | null;
   children: ReactNode;
 }) {
   const identity: WorkspaceIdentity = user
@@ -34,28 +55,15 @@ export function UserProvider({
         displayName: user.name,
         initials: deriveInitials(user.name),
         email: user.email,
+        stats: stats ?? null,
       }
-    : {
-        user: null,
-        isGuest: true,
-        displayName: "J. Ramirez",
-        initials: "JR",
-        email: "guest@recourse.io",
-      };
+    : EMPTY_GUEST_IDENTITY;
 
   return <Ctx.Provider value={identity}>{children}</Ctx.Provider>;
 }
 
 export function useIdentity(): WorkspaceIdentity {
   const v = useContext(Ctx);
-  if (!v) {
-    return {
-      user: null,
-      isGuest: true,
-      displayName: "J. Ramirez",
-      initials: "JR",
-      email: "guest@recourse.io",
-    };
-  }
+  if (!v) return EMPTY_GUEST_IDENTITY;
   return v;
 }

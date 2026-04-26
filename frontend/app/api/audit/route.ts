@@ -8,6 +8,8 @@ import {
 } from "@/lib/audit/fixtures";
 import { encodeEvent, nowTs, type AuditEvent } from "@/lib/audit/events";
 import type { BillFacts, Finding } from "@/lib/audit/schema";
+import { getCurrentUser } from "@/lib/auth/server";
+import { saveAudit } from "@/lib/db/audits";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
@@ -16,12 +18,20 @@ const MAX_PDF_BYTES = 8 * 1024 * 1024; // 8 MB
 
 async function parseRequest(
   req: NextRequest
-): Promise<{ pdf?: Uint8Array; filename?: string; useFixture: boolean }> {
+): Promise<{
+  pdf?: Uint8Array;
+  filename?: string;
+  useFixture: boolean;
+  auditId?: string;
+}> {
   const contentType = req.headers.get("content-type") ?? "";
 
   if (contentType.includes("application/json")) {
-    const body = (await req.json()) as { useFixture?: boolean };
-    return { useFixture: !!body.useFixture };
+    const body = (await req.json()) as {
+      useFixture?: boolean;
+      auditId?: string;
+    };
+    return { useFixture: !!body.useFixture, auditId: body.auditId };
   }
 
   if (contentType.includes("multipart/form-data")) {
@@ -36,10 +46,20 @@ async function parseRequest(
       );
     }
     const buf = new Uint8Array(await file.arrayBuffer());
-    return { pdf: buf, filename: file.name, useFixture: false };
+    const auditIdField = form.get("auditId");
+    return {
+      pdf: buf,
+      filename: file.name,
+      useFixture: false,
+      auditId: typeof auditIdField === "string" ? auditIdField : undefined,
+    };
   }
 
   throw new Error(`Unsupported content-type: ${contentType}`);
+}
+
+function generateAuditId(): string {
+  return `RCS-${Math.floor(Math.random() * 90000) + 10000}`;
 }
 
 function pause(ms: number) {
@@ -198,6 +218,7 @@ export async function POST(req: NextRequest) {
 
         send({ type: "findings", findings });
 
+        let body = "";
         if (findings.length > 0) {
           send({
             type: "log",
@@ -208,7 +229,6 @@ export async function POST(req: NextRequest) {
 
           send({ type: "draft-start" });
 
-          let body = "";
           let draftFailed = false;
           try {
             const result = streamLetterDraft(facts, findings);
@@ -248,6 +268,23 @@ export async function POST(req: NextRequest) {
           }
 
           send({ type: "draft-end", body });
+        }
+
+        // Persist for logged-in users (guests just get the live experience)
+        try {
+          const user = await getCurrentUser();
+          if (user && findings.length > 0 && !cancelled) {
+            await saveAudit({
+              userId: user.id,
+              auditId: parsed.auditId ?? generateAuditId(),
+              facts,
+              findings,
+              letterBody: body,
+              status: "drafting",
+            });
+          }
+        } catch (saveErr) {
+          console.error("Audit persist failed (non-fatal):", saveErr);
         }
 
         send({ type: "done" });
