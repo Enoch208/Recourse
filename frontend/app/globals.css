@@ -56,6 +56,19 @@ body {
   color: #fafafa;
 }
 
+button:not(:disabled),
+[role="button"]:not([aria-disabled="true"]),
+summary,
+label:has(> input[type="checkbox"]),
+label:has(> input[type="radio"]) {
+  cursor: pointer;
+}
+
+button:disabled,
+[role="button"][aria-disabled="true"] {
+  cursor: not-allowed;
+}
+
 .font-display {
   font-family: var(--font-display);
   font-weight: 400;
