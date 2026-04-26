@@ -59,7 +59,7 @@ export function SampleLetter() {
 
             <motion.div variants={rise} className="mt-8 flex items-center gap-3">
               <Button href="/signup">
-                Try now
+                Start audit
                 <HugeiconsIcon
                   icon={ArrowRight01Icon}
                   size={16}

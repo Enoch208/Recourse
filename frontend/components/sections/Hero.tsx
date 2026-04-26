@@ -36,7 +36,7 @@ export function Hero() {
         aria-hidden
         className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_60%_55%_at_50%_50%,rgba(255,255,255,0.72),rgba(255,255,255,0.25)_55%,transparent_80%)]"
       />
-      <Container className="relative grid min-w-0 items-center gap-12 py-24 lg:grid-cols-2 lg:gap-14 lg:py-32 lg:max-w-[1240px]">
+      <Container className="relative grid min-w-0 items-center gap-12 pb-20 pt-24 lg:grid-cols-2 lg:gap-14 lg:pb-24 lg:pt-32 lg:max-w-[1240px]">
         <motion.div
           className="flex min-w-0 flex-col"
           initial="hidden"

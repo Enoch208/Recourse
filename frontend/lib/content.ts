@@ -55,9 +55,8 @@ export const nav = {
     { label: "Solution", href: "#solution" },
     { label: "Statutes", href: "#statutes" },
     { label: "For Advocates", href: "#advocates" },
-    { label: "Journal", href: "#journal" },
   ] satisfies Link[],
-  cta: { label: "Try now", href: "/signup" },
+  cta: { label: "Start audit", href: "/signup" },
   signIn: { label: "Sign in", href: "/login" },
 };
 
@@ -66,7 +65,7 @@ export const hero = {
   title: "You have recourse.\nWe draft it in 90 seconds.",
   description:
     "Upload a medical bill. Recourse cites the statute, drafts the demand letter, and hands you a signed PDF.",
-  primary: { label: "Try now", href: "/signup" },
+  primary: { label: "Start audit", href: "/signup" },
   secondary: { label: "See the audit trail", href: "#solution" },
 };
 

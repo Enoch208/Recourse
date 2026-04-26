@@ -42,7 +42,7 @@ export function Integrations() {
       id="solution"
       className="border-t border-border bg-surface"
     >
-      <Container className="py-24 lg:py-32">
+      <Container className="py-16 lg:py-24">
         <motion.div
           initial="hidden"
           whileInView="visible"
@@ -77,30 +77,36 @@ export function Integrations() {
           whileInView="visible"
           viewport={{ once: true, amount: 0.2, margin: "0px 0px -80px 0px" }}
           variants={gridStagger}
-          className="mt-14 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:mt-16 lg:grid-cols-6"
+          className="mt-12 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:mt-14 lg:grid-cols-3"
         >
           {integrations.items.map((item) => (
             <motion.div
               key={item.label}
               variants={tileIn}
-              className="group flex h-12 items-center justify-between rounded-md border border-border bg-white px-3 transition-colors duration-200 hover:border-border-strong"
+              className="group flex items-start justify-between gap-3 rounded-md border border-border bg-white px-4 py-3.5 transition-colors duration-200 hover:border-border-strong"
             >
-              <div className="flex min-w-0 items-center gap-2.5">
-                <HugeiconsIcon
-                  icon={item.icon}
-                  size={15}
-                  strokeWidth={1.5}
-                  className="shrink-0 text-ink"
-                />
-                <span className="truncate text-[13px] text-ink">
-                  {item.label}
+              <div className="flex min-w-0 items-start gap-3">
+                <span className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-md border border-border bg-surface text-ink">
+                  <HugeiconsIcon
+                    icon={item.icon}
+                    size={14}
+                    strokeWidth={1.5}
+                  />
                 </span>
+                <div className="min-w-0">
+                  <div className="text-[13px] font-medium tracking-tight text-ink">
+                    {item.label}
+                  </div>
+                  <div className="mt-0.5 truncate font-mono text-[10px] uppercase tracking-[0.14em] text-faint">
+                    {item.extracts}
+                  </div>
+                </div>
               </div>
               <HugeiconsIcon
                 icon={PlusSignIcon}
                 size={12}
                 strokeWidth={1.5}
-                className="shrink-0 text-faint transition-colors duration-200 group-hover:text-muted"
+                className="mt-1.5 shrink-0 text-faint transition-colors duration-200 group-hover:text-muted"
               />
             </motion.div>
           ))}
