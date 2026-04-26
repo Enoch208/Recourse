@@ -41,7 +41,7 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
           </p>
           <p className="mt-3 max-w-[400px] text-[13.5px] leading-relaxed text-neutral-600">
             Upload a medical bill. Recourse cites the statute, drafts the demand
-            letter, and hands you a signed PDF — usually in under 90 seconds.
+            letter, and hands you a signed PDF — usually in under 30 seconds.
           </p>
           <div className="mt-6 flex items-center gap-5 font-mono text-[10px] uppercase tracking-[0.18em] text-neutral-500">
             <span>

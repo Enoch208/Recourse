@@ -62,7 +62,7 @@ export const nav = {
 
 export const hero = {
   eyebrow: "For patients and advocates",
-  title: "You have recourse.\nWe draft it in 90 seconds.",
+  title: "You have recourse.\nWe draft it in 30 seconds.",
   description:
     "Upload a medical bill. Recourse cites the statute, drafts the demand letter, and hands you a signed PDF.",
   primary: { label: "Start audit", href: "/signup" },

@@ -4,7 +4,7 @@ import "./globals.css";
 export const metadata: Metadata = {
   title: "Recourse — You have recourse.",
   description:
-    "Recourse turns confusing medical bills into statute-backed dispute letters in 90 seconds.",
+    "Recourse turns confusing medical bills into statute-backed dispute letters in 30 seconds.",
 };
 
 export default function RootLayout({

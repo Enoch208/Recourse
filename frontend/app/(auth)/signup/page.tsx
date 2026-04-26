@@ -55,7 +55,7 @@ export default function SignupPage() {
             Create your account
           </h1>
           <p className="mt-2 text-[13px] tracking-tight text-neutral-500">
-            Start disputing bills in 90 seconds. No card required.
+            Start disputing bills in 30 seconds. No card required.
           </p>
         </div>
 

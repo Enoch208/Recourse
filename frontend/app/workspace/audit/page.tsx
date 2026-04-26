@@ -405,7 +405,7 @@ function UploadCard(props: UploadCardProps) {
         </h1>
         <p className="mx-auto mt-2 max-w-[480px] text-[13px] leading-relaxed text-neutral-500">
           Recourse extracts the facts, runs them against the verified statute
-          library, and drafts a demand letter — usually in under 90 seconds.
+          library, and drafts a demand letter — usually in under 30 seconds.
         </p>
       </div>
 

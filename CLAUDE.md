@@ -25,7 +25,7 @@ There is no test runner configured.
 
 ## Product: Recourse
 
-**Tagline:** *You have recourse.* Turns confusing medical bills into statute-backed dispute letters in ~90 seconds by running a deterministic match between extracted bill facts and a hardcoded statute library (No Surprises Act, Reg E, etc.), then drafting a demand letter.
+**Tagline:** *You have recourse.* Turns confusing medical bills into statute-backed dispute letters in ~30 seconds by running a deterministic match between extracted bill facts and a hardcoded statute library (No Surprises Act, Reg E, etc.), then drafting a demand letter.
 
 ### The Audit Engine flow
 1. **Fact extraction** — pull Date of Service, Provider, Amount, and line items (e.g. "Facility Fee") from the uploaded bill.
