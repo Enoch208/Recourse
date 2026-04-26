@@ -34,21 +34,21 @@ type SectionProps = {
 
 function Section({ icon, title, description, children }: SectionProps) {
   return (
-    <section className="grid gap-6 border-b border-neutral-200/70 py-7 first:pt-0 last:border-b-0 lg:grid-cols-[260px_1fr]">
+    <section className="grid gap-6 border-b border-neutral-200/70 py-8 first:pt-0 last:border-b-0 lg:grid-cols-[300px_1fr] lg:gap-10">
       <div className="flex items-start gap-3">
         <span className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-[8px] bg-neutral-100 text-neutral-600">
           <HugeiconsIcon icon={icon} size={14} strokeWidth={1.5} />
         </span>
-        <div>
+        <div className="min-w-0 pt-0.5">
           <h3 className="text-[14px] font-semibold tracking-tight text-ink">
             {title}
           </h3>
-          <p className="mt-1 text-[12px] leading-relaxed text-neutral-500">
+          <p className="mt-1.5 max-w-[260px] text-[12.5px] leading-relaxed text-neutral-500">
             {description}
           </p>
         </div>
       </div>
-      <div>{children}</div>
+      <div className="min-w-0">{children}</div>
     </section>
   );
 }

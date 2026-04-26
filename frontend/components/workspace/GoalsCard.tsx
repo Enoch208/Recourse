@@ -107,12 +107,12 @@ export function GoalsCard({ thisMonth, lastMonth, byStatute, empty }: Props = {}
               />
             )}
           </svg>
-          <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
+          <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center px-6">
             <div className="font-mono text-[28px] leading-none tracking-tight text-ink">
               {Math.round(progress * 100)}%
             </div>
-            <div className="mt-1.5 font-mono text-[10px] uppercase tracking-[0.16em] text-neutral-400">
-              {weekly > 0 ? `${usd(weekly)} / week` : "Awaiting audits"}
+            <div className="mt-1.5 max-w-[100px] text-center font-mono text-[9px] uppercase leading-tight tracking-[0.14em] text-neutral-400">
+              {weekly > 0 ? `${usd(weekly)} / week` : "No audits yet"}
             </div>
           </div>
         </div>

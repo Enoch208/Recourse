@@ -191,6 +191,21 @@ function lastNDaysSums(docs: AuditDoc[], days: number): number[] {
   return out;
 }
 
+export async function statuteHitsForUser(
+  userId: string
+): Promise<Record<string, number>> {
+  const out: Record<string, number> = {};
+  if (!ObjectId.isValid(userId)) return out;
+  const col = await audits();
+  const docs = await col.find({ userId: new ObjectId(userId) }).toArray();
+  for (const d of docs) {
+    for (const f of d.findings) {
+      out[f.statuteCode] = (out[f.statuteCode] ?? 0) + 1;
+    }
+  }
+  return out;
+}
+
 export async function dashboardDataForUser(
   userId: string
 ): Promise<DashboardData> {
